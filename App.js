@@ -21,6 +21,8 @@ import WorkDetailsScreen from "./src/ServiceProvider/WorkDetails";
 import WorkLocationScreen from "./src/ServiceProvider/WorkLocation";
 import HomeProvider from "./src/ServiceProvider/HomeProvider";
 import HorizontalScroll from "./src/profile/Docs/TestUi";
+import AroundYou from "./src/ServiceProvider/AroundYou";
+import UserProfile from "./src/ServiceProvider/UserProfile";
 
 // Create Stack Navigator
 const Stack = createStackNavigator();
@@ -65,7 +67,9 @@ export default function App() {
             <Stack.Screen name="WorkDetails" component={WorkDetailsScreen} />
             <Stack.Screen name="WorkLocation" component={WorkLocationScreen} />
               <Stack.Screen name="HomeProvider" component={HomeProvider} />
-              <Stack.Screen name="HorizontalScroll" component={HorizontalScroll}/>
+              <Stack.Screen name="HorizontalScroll" component={HorizontalScroll} />
+              <Stack.Screen name="AroundYou" component={AroundYou} />
+              <Stack.Screen name="UserProfile" component={UserProfile}/>
           </>
         )}
       </Stack.Navigator>
