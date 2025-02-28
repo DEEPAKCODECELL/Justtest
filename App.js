@@ -23,6 +23,7 @@ import HomeProvider from "./src/ServiceProvider/HomeProvider";
 import HorizontalScroll from "./src/profile/Docs/TestUi";
 import AroundYou from "./src/ServiceProvider/AroundYou";
 import UserProfile from "./src/ServiceProvider/UserProfile";
+import CategoryCreate from "./src/Admin/CategoryCreate";
 
 // Create Stack Navigator
 const Stack = createStackNavigator();
@@ -69,7 +70,8 @@ export default function App() {
               <Stack.Screen name="HomeProvider" component={HomeProvider} />
               <Stack.Screen name="HorizontalScroll" component={HorizontalScroll} />
               <Stack.Screen name="AroundYou" component={AroundYou} />
-              <Stack.Screen name="UserProfile" component={UserProfile}/>
+              <Stack.Screen name="UserProfile" component={UserProfile} />
+              <Stack.Screen name="CategoryCreate" component={CategoryCreate}/>
           </>
         )}
       </Stack.Navigator>

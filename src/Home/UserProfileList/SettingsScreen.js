@@ -22,7 +22,8 @@ const settingsOptions = [
   { id: 15, title: "WorkDetails", subtitle: "Reach out in case you have a question", route: "WorkDetails" },
   { id: 16, title: "WorkLocation", subtitle: "Reach out in case you have a question", route: "WorkLocation" },
   { id: 17, title: "HomeProvider", subtitle: "Reach out in case you have a question", route: "HomeProvider" },
-];
+  {id:19,title:"Category" ,subtitle:"Admin Create Category", route:"CategoryCreate"}
+]
 
 const SettingsScreen = () => {
   const navigation = useNavigation(); 

@@ -1,13 +1,35 @@
 import React, { useState } from "react";
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from "@react-navigation/native";
 import tw from "twrnc";
 import { CheckSquare } from "lucide-react-native";
+import { loginUser } from "../redux/slices/userSlice";
 
 const Login = () => {
   const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { user, loading, error } = useSelector((state) => state.user);
+
+  const handleLogin = async () => {
+      if (phone.length == 0) {
+          console.log("Phone Number Should Not Be Empty");
+          return;
+      }
+      if (phone.length > 10) {
+          console.log("Phone Number Should Not Be Greater Than 10 Digits");
+          return;
+      }  
+      const result = await dispatch(loginUser({ phone }));
+    if (result && result.success) {
+        console.log(result.success);
+        console.log("Login Success:", result.payload);
+      } else {
+        console.log("Login Failed:", result.error.message);
+      }
+  };
 
   return (
     <View style={tw`flex-1 bg-gray-900`}>
@@ -56,7 +78,7 @@ const Login = () => {
             style={tw`bg-blue-600 p-3 rounded-lg mt-6 shadow-md`}
             onPress={() => navigation.navigate("ProfileSetup")} // Navigate to ProfileSetup page
           >
-            <Text style={tw`text-white text-center text-lg font-semibold`}>
+            <Text style={tw`text-white text-center text-lg font-semibold`} onPress={handleLogin}>
               Log In / Sign Up
             </Text>
           </TouchableOpacity>
