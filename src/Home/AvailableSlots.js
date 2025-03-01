@@ -14,7 +14,7 @@ const slots = [
 
 const AvailableSlots = () => {
     return (
-      <View style={tw``}>
+      <View style={tw`p-5`}>
                 <Text style={tw`text-lg font-bold text-gray-700`}>Available Slots</Text>
                 <View style={tw`py-2`}>
       <FlatList

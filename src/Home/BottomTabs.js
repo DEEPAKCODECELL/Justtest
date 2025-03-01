@@ -39,7 +39,7 @@ const BookingIcon = ({ size = 24, color = "black" }) => (
   </Svg>
 );
 
-const BottomTabs = () => (
+const BottomTabs = ({setIsAuthenticated}) => (
   <Tab.Navigator
     screenOptions={({ route }) => ({
       headerShown: false,
@@ -63,7 +63,9 @@ const BottomTabs = () => (
     })}
   >
     <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
+    <Tab.Screen name="Profile">
+  {() => <ProfileScreen setIsAuthenticated={setIsAuthenticated} />}
+</Tab.Screen>
     <Tab.Screen name="Bookings" component={BookingScreen} />
   </Tab.Navigator>
 );
