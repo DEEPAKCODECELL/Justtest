@@ -1,22 +1,32 @@
-import React, { useState } from "react";
-import { View, Text, Image, FlatList, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, FlatList, TouchableOpacity, Alert } from "react-native";
 import Modal from "react-native-modal";
 import tw from "../../tailwind";
 import ServiceModal from "../Bookings/ServiceModal";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchServices } from "../redux/slices/serviceSlice";
 
-const services = [
-  { name: "Everyday Cleaning" },
-  { name: "Weekly Cleaning" },
-  { name: "Laundry", },
-  { name: "Dishwashing",},
-  { name: "Bathroom Cleaning", },
-  { name: "Kitchen Prep"},
-];
 
 const OurServicesCard = () => {
+  const statedata = useSelector((state) => state);
+  console.log("statedata",statedata);
+  const [services, setServices] = useState([]);
+  const dispatch = useDispatch();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
-
+  useEffect(() => {
+    const getAllService = async () => {
+      const response = await dispatch(fetchServices());
+      console.log(response.payload.data);
+      if (response && response.payload) {
+        setServices(response.payload.data);
+      }
+      else {
+        Alert.alert("No Service Available At Your Location");
+      }
+    }
+    getAllService();
+  },[dispatch])
   const openModal = (service) => {
     setSelectedService(service);
     setModalVisible(true);
@@ -39,7 +49,10 @@ const OurServicesCard = () => {
             style={tw`w-[48%] mb-4 items-center p-2 bg-gray-100 rounded-lg shadow-sm`}
             onPress={() => openModal(item)}
           >
-            <Image source={item.image} style={{ width: 80, height: 80, resizeMode: "contain" }} />
+           <Image
+  source={{ uri: item?.images?.[0] }}
+  style={{ width: 80, height: 80, resizeMode: "contain", backgroundColor: "#f0f0f0" }}
+/>
             <Text style={tw`text-sm font-medium text-gray-800 mt-2 text-center`}>{item.name}</Text>
           </TouchableOpacity>
         )}

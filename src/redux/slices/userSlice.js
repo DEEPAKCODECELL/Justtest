@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import apiClient from "../api/apiClient"; // Ensure you have an API client
+import { CodeSquare } from "lucide-react-native";
 
 // **Async action for sending OTP**
 export const loginUser = createAsyncThunk(
@@ -63,11 +64,19 @@ export const logoutUser = createAsyncThunk(
 
 export const updateUserLocation = createAsyncThunk(
   "user/updateUserLocation",
-  async ({ latitude=null, longitude=null,searchQuery=null }, { rejectWithValue }) => {
+  async ({ latitude = null, longitude = null, searchQuery = null }, { rejectWithValue }) => {
     try {
-      console.log("Before hitting the API to update location",searchQuery);
-      const response = await apiClient.post("/auth/edit", { latitude, longitude,add_address:searchQuery });
+      console.log("Before hitting the API to update location", searchQuery);
+      
+      // Create payload with only non-null values
+      const payload = {};
+      if (latitude !== null) payload.latitude = latitude;
+      if (longitude !== null) payload.longitude = longitude;
+      if (searchQuery !== null) payload.add_address = searchQuery;
+
+      const response = await apiClient.post("/auth/edit", payload);
       console.log("Location update response:", response.data);
+
       return response.data; // Update user location in the state
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to update location");
@@ -146,17 +155,18 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       // **Handle fetching user profile**
       .addCase(fetchUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
+        console.log("fullifed user data");
         state.loading = false;
         state.user = action.payload;
       })
       .addCase(fetchUser.rejected, (state, action) => {
+        console.log("failed user data");
         state.loading = false;
         state.error = action.payload;
       })
