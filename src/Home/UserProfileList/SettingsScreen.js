@@ -25,7 +25,9 @@ const settingsOptions = [
   { id: 16, title: "WorkLocation", subtitle: "Reach out in case you have a question", route: "WorkLocation" },
   { id: 17, title: "HomeProvider", subtitle: "Reach out in case you have a question", route: "HomeProvider" },
   { id: 19, title: "Category", subtitle: "Admin Create Category", route: "CategoryCreate" },
-  {id:20,title:"LoadingBar",subtitle:"LoadingBar",route:"LoadingBar"}
+  {id:20,title:"LoadingBar",subtitle:"LoadingBar",route:"LoadingBar"},
+  {id:21,title:"Payment",subtitle:"Payment",route:"Payment"}
+
 ]
 
 const SettingsScreen = ({setIsAuthenticated}) => {
