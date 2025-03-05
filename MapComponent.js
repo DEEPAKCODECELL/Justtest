@@ -9,6 +9,7 @@ import tw from "./tailwind";
 import useWebSocket from "./src/Hook/GetRealtimeLocation";
 import useFetchLocationForProvider from "./src/Hook/UpdareRealTimeForProvider";
 
+
 // **Initial Region (Bangalore, India)**
 const INITIAL_REGION = {
   latitude: 12.9716,
