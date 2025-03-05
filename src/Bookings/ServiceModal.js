@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 const ServiceModal = () => {
    const navigation = useNavigation();  
   const services = useSelector((state) => state.service.services.data);
+  console.log("services check for expre", services);
   const [selectedService, setSelectedService] = useState(services[0]);
   const handleBookNow = () => {
     navigation.navigate("ChooseService", {
@@ -54,15 +55,14 @@ const ServiceModal = () => {
         {/* Expert Training Section */}
         <Text style={tw`text-lg font-bold`}>The expert is trained to</Text>
         {selectedService?.expert_is_trained_in?.map((task, index) => (
-          <Text key={index} style={tw`text-white mt-4`}>✅ {task}</Text>
+          <Text key={index} style={tw`text-black mt-4`}>✅   {task}</Text>
         ))}
-
         {/* Service Excludes Section */}
         {selectedService?.service_excludes?.length > 0 && (
           <>
             <Text style={tw`text-lg font-bold mt-4`}>Service excludes</Text>
             {selectedService.service_excludes.map((exclude, index) => (
-              <Text key={index} style={tw`text-red-500 mt-4`}>❌ {exclude}</Text>
+              <Text key={index} style={tw`text-red-500 mt-4`}>❌   {exclude}</Text>
             ))}
           </>
         )}
@@ -74,7 +74,7 @@ const ServiceModal = () => {
             <Text style={tw`text-lg font-bold`}>What We Need From You:</Text>
             {selectedService.what_we_need_from_you.map((item, index) => (
               <View key={index} style={tw`mt-4`}>
-                <Text style={tw`text-gray-700`}>📌 {item.description}</Text>
+                <Text style={tw`text-gray-700`}>📌   {item.description}</Text>
               </View>
             ))}
           </View>
