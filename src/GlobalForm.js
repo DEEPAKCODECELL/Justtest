@@ -46,8 +46,8 @@ const GlobalForm = ({ fields, onSubmit, buttonText }) => {
 
   return (
     <View style={tw`p-6`}>
-      {fields.map((field) => (
-        <View key={field.name} style={tw`mb-4`}>
+      {fields.map((field,index) => (
+        <View key={index} style={tw`mb-4`}>
           <Text style={tw`text-lg text-gray-700 mb-2`}>{field.label}</Text>
           {field.type === "text" && (
             <TextInput
