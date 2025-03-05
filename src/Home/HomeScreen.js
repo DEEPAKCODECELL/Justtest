@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import tw from "../../tailwind";
 import WalletSVG from "../svg/WalletSvg";
@@ -8,11 +8,11 @@ import ScheduleSlot from "./ScheduleSlot";
 import OurServicesCard from "./OurServicesCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUser } from "../redux/slices/userSlice";
-import { ScrollView } from "react-native-gesture-handler";
 
 const dummyAddress = { id: "1", name: "123 Main St, New York, NY" };
 
 const HomeScreen = () => {
+  
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [realAddress, setRealAddress] = useState(null);
@@ -36,7 +36,10 @@ const HomeScreen = () => {
     getUser();
   }, [dispatch]);
   return (
-      <ScrollView style={tw`flex-1 bg-white`} nestedScrollEnabled={true}>
+    <ScrollView style={tw`flex-1 bg-white`} nestedScrollEnabled={true}
+    showsVerticalScrollIndicator={false} 
+  showsHorizontalScrollIndicator={false}
+    >
       {/* Header Section */}
       <View style={tw`flex-row justify-between items-center p-5`}>
         <View>
