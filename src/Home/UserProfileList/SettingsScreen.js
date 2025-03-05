@@ -13,7 +13,7 @@ const settingsOptions = [
   {id: 18,title:"FetchAddress",subtitle:"FetchAddress", route:"FetchAddress"},
   { id: 4, title: "Refer And Earn", subtitle: "Earn Money For Referral", route: "Refer" },
   { id: 5, title: "Policies", subtitle: "Terms of Use, Privacy Policy and others", route: "Policies" },
-  { id: 6, title: "Help & support", subtitle: "Reach out in case you have a question", route: "HelpSupport" },
+  { id: 6, title: "Help & support", subtitle: "Reach out in case you have a question", route: "HelpAndSupport" },
   { id: 7, title: "BookingHistory", subtitle: "Reach out in case you have a question", route: "BookingHistory" },
   { id: 8, title: "OrderDetails", subtitle: "Reach out in case you have a question", route: "OrderDetails" },
   { id: 9, title: "FAQs", subtitle: "Reach out in case you have a question", route: "FAQs" },
@@ -25,9 +25,8 @@ const settingsOptions = [
   { id: 16, title: "WorkLocation", subtitle: "Reach out in case you have a question", route: "WorkLocation" },
   { id: 17, title: "HomeProvider", subtitle: "Reach out in case you have a question", route: "HomeProvider" },
   { id: 19, title: "Category", subtitle: "Admin Create Category", route: "CategoryCreate" },
-  {id:20,title:"LoadingBar",subtitle:"LoadingBar",route:"LoadingBar"},
-  {id:21,title:"Payment",subtitle:"Payment",route:"Payment"}
-
+  { id: 20, title: "LoadingBar", subtitle: "LoadingBar", route: "LoadingBar" },
+  {id:21,title:"MapComponent", subtitle:"MapComponent", route:"MapComponent"}
 ]
 
 const SettingsScreen = ({setIsAuthenticated}) => {
