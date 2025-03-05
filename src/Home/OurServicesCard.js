@@ -46,15 +46,21 @@ const OurServicesCard = () => {
         columnWrapperStyle={tw`justify-between`}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={tw`w-[48%] mb-4 items-center p-2 bg-gray-100 rounded-lg shadow-sm`}
-            onPress={() => openModal(item)}
-          >
-           <Image
-  source={{ uri: item?.images?.[0] }}
-  style={{ width: 80, height: 80, resizeMode: "contain", backgroundColor: "#f0f0f0" }}
-/>
-            <Text style={tw`text-sm font-medium text-gray-800 mt-2 text-center`}>{item.name}</Text>
-          </TouchableOpacity>
+  style={tw`w-[48%] mb-4 items-center p-2 bg-gray-100 rounded-lg shadow-sm`}
+  onPress={() => openModal(item)}
+>
+  <View style={tw`w-full h-32 rounded-lg overflow-hidden`}>
+    <Image
+      source={{ uri: item?.images?.[0] }}
+      style={tw`w-full h-full`}
+      resizeMode="cover"
+    />
+  </View>
+  <Text style={tw`text-sm font-medium text-gray-800 mt-2 text-center`}>
+    {item.name}
+  </Text>
+</TouchableOpacity>
+
         )}
       />
 
