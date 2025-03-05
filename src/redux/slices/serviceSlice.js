@@ -19,10 +19,16 @@ export const fetchServices = createAsyncThunk(
 // Fetch service option by ID
 export const fetchServiceOption = createAsyncThunk(
   'services/fetchOption',
-  async (serviceId, { rejectWithValue }) => {
+  async({serviceId, latitude, longitude, radius,date},{ rejectWithValue }) => {
     try {
-      console.log("Fetching service option for ID:", serviceId);
-      const response = await apiClient.get(`/admin/service-option/${serviceId}`);
+      console.log("Fetching service option for ID:", serviceId,date);
+      const response = await apiClient.post(`/service-provider/get-providers-within-radius`, {
+        serviceId,
+        latitude,
+        longitude,
+        radius,
+        date
+      });
       console.log("Service option response:", response.data);
       return response.data;
     } catch (error) {
@@ -35,7 +41,7 @@ export const fetchProvidersWithinRadius = createAsyncThunk(
   "providers/fetchWithinRadius",
   async ({ latitude, longitude, radius, serviceId }, { rejectWithValue }) => {
     try {
-      console.log("Fetching providers with:", latitude, longitude, radius, serviceId);
+      console.log("Fetching providers with: property of lat and long", latitude, longitude, radius, serviceId);
       const response = await apiClient.post("/service-provider/get-providers-within-radius", {
         latitude,
         longitude,
