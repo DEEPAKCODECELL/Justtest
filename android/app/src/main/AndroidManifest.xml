@@ -1,9 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />   
 
     <application
       android:name=".MainApplication"
@@ -13,6 +12,8 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       android:supportsRtl="true">
+      <service android:name="com.transistorsoft.locationmanager.service.TrackingService"
+    android:foregroundServiceType="location" />
       <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBklNOyD5kNf9N6fo3NbLnqVBHkV_o90E4"/>
