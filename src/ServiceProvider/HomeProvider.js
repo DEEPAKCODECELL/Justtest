@@ -114,53 +114,7 @@ const HomeProvider = () => {
           </Text>
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation Fixed */}
-      <View
-        style={tw`absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex-row justify-between px-2 py-3`}
-      >
-        <TouchableOpacity
-          style={tw`flex-1 items-center`}
-          onPress={() => navigation.navigate("HomeProvider")}
-        >
-          <Text style={tw`text-lg`}>📊</Text>
-          <Text style={tw`text-xs text-gray-500`}>Progress</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={tw`flex-1 items-center`}>
-          <Text style={tw`text-lg`}>💰</Text>
-          <Text style={tw`text-xs text-gray-500`}>Money</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={tw`flex-1 items-center`}
-          onPress={() => navigation.navigate("AroundYou")}
-        >
-          <View
-            style={tw`w-8 h-8 rounded-full bg-amber-100 items-center justify-center`}
-          >
-            <Text style={tw`text-amber-800 font-bold`}>UC</Text>
-          </View>
-          <Text style={tw`text-xs text-amber-800 font-medium`}>Around You</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={tw`flex-1 items-center`}>
-          <Text style={tw`text-lg`}>🔄</Text>
-          <Text style={tw`text-xs text-gray-500`}>Call</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={tw`flex-1 items-center justify-center`}
-          onPress={() => navigation.navigate("UserProfile")}
-        >
-          <View style={tw`h-6 justify-center`}>
-            <UserIcon size={22} color="black" />
-          </View>
-          <Text style={tw`text-xs text-gray-500`}>Profile</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
-
 export default HomeProvider;
