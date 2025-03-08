@@ -31,6 +31,10 @@ import Login from "./src/ServiceProvider/Login";
 import FetchAddress from "./src/Home/UserProfileList/FetchAddress";
 import MapComponent from "./MapComponent";
 import HelpAndSupport from "./src/helpsupport/HelpAndSupport";
+import { Payment } from "./src/Home/UserProfileList/Payment";
+import BookingScreen from "./src/Bookings/BookingScreen";
+import AdminBottomTabs from "./src/Admin/AdminBottomTabs";
+import ProviderBottomTabs from "./src/realserviceprovider/ProviderBottomTabs";
 
 
 const Stack = createStackNavigator();
@@ -38,12 +42,15 @@ const Stack = createStackNavigator();
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const[role,setRole]=useState(null);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken"); // Get token from storage
+        const roleProfile=await AsyncStorage.getItem("role");
         setIsAuthenticated(!!token); // If token exists, user is authenticated
+        setRole(roleProfile); // Get role from storage
       } catch (error) {
         console.log("Error checking auth status:", error);
       } finally {
@@ -62,14 +69,28 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
-          <Stack.Screen name="BottomTabs">
-            {() => <BottomTabs setIsAuthenticated={setIsAuthenticated} />}
-          </Stack.Screen>
-        ) : (
-          <Stack.Screen name="Login">
-            {() => <Login setIsAuthenticated={setIsAuthenticated} />}
-          </Stack.Screen>
-        )}
+  role === "user" ? (
+    <Stack.Screen name="BottomTabs">
+      {() => <BottomTabs setIsAuthenticated={setIsAuthenticated} />}
+    </Stack.Screen>
+  ) : role === "admin" ? (
+    <Stack.Screen name="AdminBottomTabs">
+      {() => <AdminBottomTabs setIsAuthenticated={setIsAuthenticated} />}
+    </Stack.Screen>
+  ) : role === "provider" ? (
+    <Stack.Screen name="ProviderBottomTabs">
+      {() => <ProviderBottomTabs setIsAuthenticated={setIsAuthenticated} />}
+    </Stack.Screen>
+  ) : (
+    <Stack.Screen name="Login">
+      {() => <Login setIsAuthenticated={setIsAuthenticated} />}
+    </Stack.Screen>
+  )
+) : (
+  <Stack.Screen name="Login">
+    {() => <Login setIsAuthenticated={setIsAuthenticated} />}
+  </Stack.Screen>
+)}
 
         {/* Other screens */}
         <Stack.Screen name="VerifyOtp">
@@ -98,8 +119,11 @@ export default function App() {
         <Stack.Screen name="LoadingBar" component={LoadingBar} />
         <Stack.Screen name="FetchAddress" component={FetchAddress} />
         <Stack.Screen name="MapComponent" component={MapComponent} />
-        <Stack.Screen name="HelpAndSupport" component={HelpAndSupport}/>
+        <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
+        <Stack.Screen name="Payment" component={Payment} />
+        <Stack.Screen name="BookingScreen" component={BookingScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
