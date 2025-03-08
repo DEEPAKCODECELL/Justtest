@@ -9,6 +9,7 @@ const { width } = Dimensions.get("window");
 
 const settingsOptions = [
   { id: 1, title: "Profile", subtitle: "Update personal information", route: "ActualProfile" },
+  { id: 30, title: "Payments", subtitle: "Payments", route: "Payment" },
   { id: 3, title: "Addresses", subtitle: "Manage saved addresses", route: "AddressScreen" },
   {id: 18,title:"FetchAddress",subtitle:"FetchAddress", route:"FetchAddress"},
   { id: 4, title: "Refer And Earn", subtitle: "Earn Money For Referral", route: "Refer" },
@@ -36,9 +37,10 @@ const SettingsScreen = ({setIsAuthenticated}) => {
   const result = await dispatch(logoutUser());
   console.log("setting page Response", result);
   if (result && result.payload?.success) {
-    await AsyncStorage.removeItem("authToken"); // Remove token from storage
+    await AsyncStorage.removeItem("authToken");// Remove token from storage
+    await AsyncStorage.removeItem("role");// Remove role from storage
     console.log("Auth token removed");
-    setIsAuthenticated(false);
+    navigation.navigate("Login");
   } else {
     console.log("Logout failed");
   }
