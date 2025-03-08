@@ -66,7 +66,7 @@ export const updateUserLocation = createAsyncThunk(
   "user/updateUserLocation",
   async ({ latitude = null, longitude = null, searchQuery = null }, { rejectWithValue }) => {
     try {
-      console.log("Before hitting the API to update location", searchQuery);
+      console.log("Before hitting the API to update location get hit", searchQuery);
       
       // Create payload with only non-null values
       const payload = {};
@@ -80,6 +80,22 @@ export const updateUserLocation = createAsyncThunk(
       return response.data; // Update user location in the state
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to update location");
+    }
+  }
+);
+
+export const selectUserLocation = createAsyncThunk(
+  "user/updateUserLocation",
+  async (searchQuery, { rejectWithValue }) => {
+    try {
+      console.log("Fetching coordinates for address:", searchQuery);
+      
+      const response = await apiClient.get(`/location/getCordinate?address=${encodeURIComponent(searchQuery)}`);
+      console.log("Location coordinates response:", response.data);
+
+      return response.data; // Assuming response contains latitude & longitude
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch coordinates");
     }
   }
 );
