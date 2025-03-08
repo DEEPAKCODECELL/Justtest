@@ -61,18 +61,15 @@ const SearchBox = ({placeholder = 'Add a new address', onSelect}) => {
     }
   };
 
-  const handleSuggestionClick = async suggestion => {
-    console.log('Selected:', suggestion.description);
-    const response = await dispatch(
-      updateUserLocation({
-        latitude: null,
-        longitude: null,
-        searchQuery: suggestion.description,
-      }),
-    );
-
-    console.log(response, 'after');
+  const handleSuggestionClick = async (suggestion) => {
+    console.log('Selected: adresdgfujhbknjm', suggestion.description);
+    const response = await dispatch(updateUserLocation({  latitude: null,  longitude: null,  searchQuery: suggestion.description}))
+    console.log('response checking after calling api', response);
   };
+
+  const handleselectAddress = () => {
+       console.log('Selected: adresdgfujhbknjm', suggestion.description);
+  }
 
   return (
     <View style={tw`relative w-full p-3`}>
@@ -159,11 +156,15 @@ const SavedLocation = ({location, onClick}) => {
 const AddressScreen = () => {
   const data = useSelector(state => state.user);
   console.log('data check', data?.user?.data?.listofAddress);
+  const dispatch = useDispatch();
   const [locations, setLocations] = useState(
     data?.user?.data?.listofAddress || null,
   );
-  const handleLocationClick = location =>
-    console.log('Selected Location:', location);
+  const handleLocationClick =async (location) => {
+    console.log('Selected Location:', location); 
+     const response = await dispatch(updateUserLocation({  latitude: null,  longitude: null,  searchQuery: location}))
+    console.log('response checking after calling api', response);
+  }
 
   return (
     <FlatList
@@ -172,8 +173,8 @@ const AddressScreen = () => {
           <Header title="Your Address" />
           <SearchBox onSelect={val => console.log('Selected Address:', val)} />
           <CurrentLocation />
-          <Text style={tw`text-lg font-medium mb-2`}>Saved Locations</Text>
-          {locations.map((location, index) => (
+          <Text style={tw`text-lg font-medium mb-2`}>Saved Locations Click To Make This Default Location</Text>
+          {locations&&locations?.map((location, index) => (
             <SavedLocation
               key={index}
               location={location}
