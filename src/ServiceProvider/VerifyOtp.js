@@ -21,9 +21,11 @@ const VerifyOtp = ({setIsAuthenticated}) => {
   const result = await dispatch(verifyOtp({ phone:phone, otp:mergedOtp }));
   console.log(result);
   if (result.payload.success) {
-    await AsyncStorage.setItem("authToken", result.payload.data.token); // Store token
-    console.log("toekn",result.payload.data.token)
-    navigation.navigate("FetchAddress")
+    await AsyncStorage.setItem("authToken", result.payload.data.token);// Store token
+    await AsyncStorage.setItem("role", result.payload.data.role);// Store role
+    console.log("toekn", result.payload.data.token)
+    if (result.payload.data.role != "admin") navigation.navigate("FetchAddress")
+    else navigation.navigate("CategoryCreate");
   } else {
     console.log("Login Failed");
   }
