@@ -2,8 +2,10 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "./HomeScreen";
 import ProfileScreen from "../profile/ProfileScreen";
-import { BookingScreen } from "../Bookings/BookingScreen";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
+import BookingScreen from "../Bookings/BookingScreen";
+import useAuthRole from "../Hook/useAuthRole";
+import { Text } from "react-native";
 const Tab = createBottomTabNavigator();
 
 const HomeIcon = ({ size = 24, color = "black" }) => (
@@ -39,8 +41,15 @@ const BookingIcon = ({ size = 24, color = "black" }) => (
   </Svg>
 );
 
-const BottomTabs = ({setIsAuthenticated}) => (
-  <Tab.Navigator
+const BottomTabs =  ({ setIsAuthenticated }) => {
+  const { role, isLoading } = useAuthRole();
+  if (isLoading) {
+    return <Text>Loading...</Text>; // Show loading while fetching role
+  }
+  if (role !== "user") {
+    return <Text>Access Denied</Text>; // Restrict access for non-admin users
+  }
+  return (<Tab.Navigator
     screenOptions={({ route }) => ({
       headerShown: false,
       tabBarStyle: {
@@ -68,6 +77,7 @@ const BottomTabs = ({setIsAuthenticated}) => (
 </Tab.Screen>
     <Tab.Screen name="Bookings" component={BookingScreen} />
   </Tab.Navigator>
-);
+  )
+};
 
 export default BottomTabs;
