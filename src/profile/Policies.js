@@ -11,7 +11,7 @@ const PolicyItem = ({ icon: Icon, title, to }) => {
       onPress={() => navigation.navigate(to)}
       style={tw`flex-row items-center justify-between p-4 mb-3 bg-white rounded-lg shadow-md`}
     >
-      <View style={tw`flex-row items-center space-x-3`}>
+      <View style={tw`flex-row items-center gap-x-3`}>
         <View style={tw`p-2 rounded-lg bg-purple-100`}>
           <Icon size={20} color="#6B21A8" />
         </View>
