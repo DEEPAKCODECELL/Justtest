@@ -9,8 +9,11 @@ import LocationMarker from "../../ServiceProvider/components/LocationMarker";
 import { CodeSquare } from "lucide-react-native";
 import { updateUserLocation } from "../../redux/slices/userSlice";
 import { useDispatch } from "react-redux";
+import useAuthRole from "../../Hook/useAuthRole";
 
 const FetchAddress = () => {
+  const { role, isLoading: loadingfornow } = useAuthRole();
+  if(loadingfornow) return null;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [location, setLocation] = useState(null);
@@ -21,28 +24,40 @@ const FetchAddress = () => {
   const [isLoading, setIsLoading] = useState(true);
   // Request Location Permission
   const requestPermissionUsingRNPermissions = async () => {
-    console.log("Getting permission...");
+  console.log("Getting permission...");
 
-    try {
-      const result = await request(
-        Platform.OS === "ios"
-          ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
-          : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-      );
+  try {
+    const locationPermission = await request(
+      Platform.OS === "ios"
+        ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+        : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
+    );
 
-      if (result === RESULTS.GRANTED) {
-        console.log("Location permission granted");
-        return true;
-      } else {
-        console.log("Location permission denied");
-        Alert.alert("Permission Denied", "Enable location access for a better experience.");
-        return false;
-      }
-    } catch (error) {
-      console.error("Error requesting location permission:", error);
+    if (locationPermission !== RESULTS.GRANTED) {
+      console.log("Location permission denied");
+      Alert.alert("Permission Denied", "Enable location access for a better experience.");
       return false;
     }
-  };
+
+    if (Platform.OS === "android") {
+      const backgroundPermission = await request(PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION);
+      if (backgroundPermission !== RESULTS.GRANTED) {
+        console.log("Background location permission denied");
+        Alert.alert(
+          "Background Location Required",
+          "To get accurate location, allow background location access."
+        );
+      }
+    }
+
+    console.log("Location permission granted");
+    return true;
+  } catch (error) {
+    console.error("Error requesting location permission:", error);
+    return false;
+  }
+};
+
 
   // Get User Location
   const sendLocation = async () => {
@@ -56,14 +71,16 @@ const FetchAddress = () => {
           const result = await dispatch(updateUserLocation({ latitude, longitude }));
           if (result && result.payload?.success) {
             setIsLoading(false);
-            navigation.navigate("BottomTabs");
+            if (role == "user") navigation.navigate("BottomTabs");
+            else if (role == 'provider') navigation.navigate("ProviderBottomTabs");
+            else if (role == 'admin') navigation.navigate("AdminBottomTabs");
           }
         },
         (error) => {
           console.error("Error getting location:", error);
           Alert.alert("Location Error", "Could not fetch location. Please try again.");
         },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     } catch (error) {
       console.error("Geolocation error:", error);
