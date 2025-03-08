@@ -4,13 +4,17 @@ import apiClient from "../api/apiClient";
 // Initiate Booking
 export const initiateBooking = createAsyncThunk(
   "booking/initiate",
-  async ( { selectedDate, selectedDuration, serviceOptionId,selectedTime, uniqueProvidersArray } , { rejectWithValue }) => {
-    try {
+  async ( { selectedDate, selectedDuration, serviceOptionId,selectedTime, uniqueProvidersArray,serviceId,isScheduled } , { rejectWithValue }) => {
+      try {
+        if(!isScheduled) {
+            start_time = getInstantTime();
+        }
       console.log("Initiating booking with data:", selectedDate, selectedDuration, selectedTime, uniqueProvidersArray,serviceOptionId );
      const response = await apiClient.post("/booking/initiate", {
-        date:selectedDate, duration:selectedDuration,serviceoption:serviceOptionId, start_time:selectedTime, providersList:uniqueProvidersArray 
+         date: selectedDate, duration: selectedDuration, serviceoption: serviceOptionId, start_time: isScheduled?selectedTime:start_time, providersList: uniqueProvidersArray,
+         actualService:serviceId
      });
-      console.log("Booking initiated successfully:", response.data);
+      console.log("Booking initiated successfully:", response);
       return response.data;
     } catch (error) {
       console.error("Error initiating booking:", error);
@@ -38,12 +42,79 @@ export const confirmBooking = createAsyncThunk(
   }
 );
 
+export const getAllBookings = createAsyncThunk(
+  "booking/getAll",
+  async (_, { rejectWithValue }) => {
+    try {
+      console.log("Fetching all bookings...");
+      const response = await apiClient.get("/booking/all");
+      console.log("Fetched bookings successfully:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      return rejectWithValue(error.response?.data || "Failed to fetch bookings");
+    }
+  }
+);
+
+
+export const applyPromoCode = createAsyncThunk(
+  "booking/applyPromoCode",
+  async ({ bookingId, promoCode }, { rejectWithValue }) => {
+    try {
+      console.log("Applying promo code...");
+      const response = await apiClient.post(`/promocode/apply-code`, {
+        bookingId,
+        promoCode,
+      });
+
+      console.log("Promo code applied successfully:", response);
+      return response.data; // Should return updated booking details
+    } catch (error) {
+      console.error("Error applying promo code:", error);
+      return rejectWithValue(error.response?.data || "Failed to apply promo code");
+    }
+  }
+);
+
+export const makeBooking = createAsyncThunk(
+  "booking/make",
+    async({modeOfPayment, pointsUsed, bookingId, location,status,showFinalPrice} ,{ rejectWithValue }) => {
+    try {
+      console.log("Making a new booking...",modeOfPayment,pointsUsed,bookingId,location,status);
+      const response = await apiClient.post("/booking/confirm-booking",{modeOfPayment:modeOfPayment, pointsUsed:pointsUsed, bookingId:bookingId, address:location,status:status,finalPrice:showFinalPrice});
+      console.log("Booking successful:", response);
+      return response.data;
+    } catch (error) {
+      console.error("Error making booking:", error);
+      return rejectWithValue(error.response?.data || "Failed to create booking");
+    }
+  }
+);
+
+export const fetchBookingDetails = createAsyncThunk(
+  "booking/fetchBookingDetails",
+  async ({ bookingId }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(`/booking/${bookingId}`);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch booking details");
+    }
+  }
+);
+
+
 const bookingSlice = createSlice({
   name: "booking",
   initialState: {
     currentBooking: null,
+    allBookings: [],
     loading: false,
+    successPromo: false,
+    promocodediscount:0,
     error: null,
+    bookingDetails: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -76,8 +147,79 @@ const bookingSlice = createSlice({
         console.log("Failed to confirm booking");
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Fetch All Bookings
+      .addCase(getAllBookings.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAllBookings.fulfilled, (state, action) => {
+        console.log("Fetched all bookings successfully");
+        state.loading = false;
+        state.allBookings = action.payload;
+      })
+      .addCase(getAllBookings.rejected, (state, action) => {
+        console.log("Failed to fetch bookings");
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Apply Promo Code
+      .addCase(applyPromoCode.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(applyPromoCode.fulfilled, (state, action) => {
+        console.log("Promo code applied successfully");
+        state.loading = false;
+        if (state.currentBooking) {
+            state.successPromo = true;
+            state.promocodediscount = action.payload.discount;
+            console.log("get payload",action.payload);
+        }
+      })
+      .addCase(applyPromoCode.rejected, (state, action) => {
+        console.log("Failed to apply promo code");
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(makeBooking.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      // Handle booking success
+      .addCase(makeBooking.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookings.push(action.payload); // Add new booking to state
+      })
+      // Handle booking failure
+      .addCase(makeBooking.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchBookingDetails.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchBookingDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bookingDetails = action.payload;
+      })
+      .addCase(fetchBookingDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
+const getInstantTime = () => {
+    const now = new Date();
+    const currentMinutes = now.getMinutes();
+    const currentHours = now.getHours();
+    // Calculate the next 15-minute interval
+    const nextInterval = 15 - (currentMinutes % 15);
+    let startTime = new Date(now);
+    startTime.setMinutes(currentMinutes + nextInterval);
+    startTime.setSeconds(0);
+    startTime.setMilliseconds(0);
+  return startTime;
+}
 export default bookingSlice.reducer;
