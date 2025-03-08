@@ -5,7 +5,7 @@ import { request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { updateUserLocation } from "../redux/slices/userSlice";
-
+import Toast from "react-native-toast-message";
 const useFetchLocation = (trigger) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -43,11 +43,11 @@ const useFetchLocation = (trigger) => {
 
         // Dispatch location to Redux
         const result = await dispatch(updateUserLocation({ latitude, longitude }));
-        
+        console.log("wwe fighting")
         if (result?.payload?.success) {
-          navigation.replace("BottomTabs");
+            console.log("result show the address")
         }
-
+        
         setIsLoading(false);
       },
       (err) => {
