@@ -137,38 +137,24 @@ const ChooseService = () => {
     }
   }, [dispatch, serviceId, userlatlong, selectedDate]);
 
-  const handleBookings = async() => {
-    if (isScheduled) {
-      if (selectedDate && selectedDuration!=undefined && selectedTime) {
-        console.log("data check for booking", selectedDate, selectedDuration, selectedTime);
-        // Need To CreateList Of providers Against a Service Option
-        console.log("duration check provider", durations);
-        const listofProviders = new Set();
-        for (let i = 0; i < durations.length; i++) {
-          console.log("loop running", durations[i]._id, serviceOptionId, "length", durations.length);
-          if (durations[i]._id === serviceOptionId) {
-            console.log("get hit");
-            listofProviders.add(durations[i].service_provider);
-          }
-        }
-        // Convert Set back to an array if needed
-        const uniqueProvidersArray = Array.from(listofProviders);
-        console.log("detail check", uniqueProvidersArray);
-        const response = await dispatch(initiateBooking({ selectedDate, selectedDuration,serviceOptionId, selectedTime, uniqueProvidersArray }));
-      }
-      else {
-        console.log("Select The necessary Details");
-        return;
+  const handleBookings = async () => {
+    if ((isScheduled && (!selectedDate || !selectedDuration || !selectedTime || !serviceId)) ||(!isScheduled && !serviceId)) {
+      console.log("Enter The Feilds");
+      return;
+    }
+    console.log("data check for booking", selectedDate, selectedDuration, selectedTime);
+    // Need To CreateList Of providers Against a Service Option
+    console.log("duration check provider", durations);
+    const listofProviders = new Set();
+    for (let i = 0; i < durations.length; i++) {
+      console.log("loop running", durations[i]._id, serviceOptionId, "length", durations.length);
+      if (durations[i]._id === serviceOptionId) {
+        console.log("get hit");
+        listofProviders.add(durations[i].service_provider);
       }
     }
-    else {
-      if (selectedDate && selectedDuration) {
-        console.log(selectedDate, selectedDuration);
-      }
-      else {
-        console.log("Select The necessary Details");
-      }
-    }
+    const uniqueProvidersArray = Array.from(listofProviders);
+    const response = await dispatch(initiateBooking({ selectedDate, selectedDuration, serviceOptionId, selectedTime, uniqueProvidersArray, serviceId,isScheduled }));
     navigation.navigate("ReviewBookingPage");    
   }
 
