@@ -39,8 +39,8 @@ const SettingsScreen = ({setIsAuthenticated}) => {
   if (result && result.payload?.success) {
     await AsyncStorage.removeItem("authToken");// Remove token from storage
     await AsyncStorage.removeItem("role");// Remove role from storage
-    console.log("Auth token removed");
-    navigation.navigate("Login");
+    console.log("Auth token removed and role removed");
+    navigation.navigate("LoginAfterLogout");
   } else {
     console.log("Logout failed");
   }
