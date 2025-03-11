@@ -7,6 +7,9 @@ import ProfileScreen from "../profile/ProfileScreen";
 import HomeScreen from "../Home/HomeScreen";
 import BookingScreen from "../Bookings/BookingScreen";
 import useAuthRole from "../Hook/useAuthRole";
+import CategoryCreate from "./CategoryCreate";
+import Index from "./Index";
+import ServiceProviderList from "./ServiceProviderList";
 const Tab = createBottomTabNavigator();
 
 const HomeIcon = ({ size = 24, color = "black" }) => (
@@ -47,7 +50,7 @@ const AdminBottomTabs =  ({ setIsAuthenticated }) => {
   if (isLoading) {
     return <Text>Loading...</Text>; // Show loading while fetching role
   }
-  if (role !== "user") {
+  if (role !== "Admin") {
     return <Text>Access Denied</Text>; // Restrict access for non-admin users
   }
   return (<Tab.Navigator
@@ -67,16 +70,17 @@ const AdminBottomTabs =  ({ setIsAuthenticated }) => {
       tabBarInactiveTintColor: "gray", // Inactive tab color
       tabBarIcon: ({ color, size }) => {
         if (route.name === "Home") return <HomeIcon size={size} color={color} />;
-        if (route.name === "Profile") return <ProfileIcon size={size} color={color} />;
-        if (route.name === "Bookings") return <BookingIcon size={size} color={color} />;
+        if (route.name === "CurrentJobs") return <ProfileIcon size={size} color={color} />;
+        if (route.name === "ServiceProviderList") return <BookingIcon size={size} color={color} />;
+        if(route.name === "ProviderDetails") return <ProfileIcon size={size} color={color} />;
       },
     })}
   >
-    <Tab.Screen name="Home" component={HomeScreen} />
-    <Tab.Screen name="Profile">
+    <Tab.Screen name="Home" component={CategoryCreate} />
+    <Tab.Screen name="CurrentJobs">
   {() => <ProfileScreen setIsAuthenticated={setIsAuthenticated} />}
-</Tab.Screen>
-    <Tab.Screen name="Bookings" component={BookingScreen} />
+    </Tab.Screen>
+    <Tab.Screen name="ServiceProviderList" component={ServiceProviderList} />
   </Tab.Navigator>
   )
 };
