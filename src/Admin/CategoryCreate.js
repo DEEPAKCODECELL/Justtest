@@ -1,50 +1,124 @@
-import React, { useState } from "react";
-import { ScrollView, Alert } from "react-native";
-import { z } from "zod";
+import React from "react";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+ import { useNavigation } from "@react-navigation/native";
+ import { Wrench, Tag, Menu } from "lucide-react-native";
 import tw from "../../tailwind";
-import GlobalForm from "../GlobalForm";
 
-const createCategorySchema = z.object({
-  category: z.string().min(2, { message: "Category must be at least 2 characters long" }),
-  description: z.string().min(10, { message: "Description must be at least 10 characters long" }),
-  images: z.array(z.string().url({ message: "Each image must be a valid URL" })),
-});
+
+const sampleActualServices = [
+  { _id: "1", name: "Plumbing", description: "Fixing pipes and leaks" },
+  { _id: "2", name: "Cleaning", description: "House and office cleaning" },
+  { _id: "3", name: "Electrician", description: "Fixing electrical issues" },
+];
+
+const sampleServiceOptions = [{ _id: "1" }, { _id: "2" }];
 
 const CategoryCreate = () => {
-  const handleSubmit = (formData) => {
-    const parsedData = createCategorySchema.safeParse(formData);
-    if (!parsedData.success) {
-      Alert.alert("Validation Error", parsedData.error.errors[0].message);
-      return;
-    }
-    Alert.alert("Success", "Category created successfully");
-    console.log("Form Data:", formData);
-  };
-
-  const fields = [
-    {
-      name: "category",
-      label: "Category",
-      type: "text",
-      placeholder: "Enter category name",
-    },
-    {
-      name: "description",
-      label: "Description",
-      type: "text",
-      placeholder: "Enter description",
-    },
-    {
-      name: "images",
-      label: "Upload Images",
-      type: "file",
-      placeholder: "Select Images",
-    },
-  ];
+  const navigation = useNavigation();
+  const actualServiceCount = sampleActualServices.length;
+  const serviceOptionCount = sampleServiceOptions.length;
+  console.log("actualServiceCount", actualServiceCount);
+  console.log("CategoserviceOptionCountry", serviceOptionCount);
 
   return (
-      <GlobalForm fields={fields} onSubmit={handleSubmit} buttonText="Create Category" />
+    <View style={tw`flex-1 bg-blue-50 p-4`}> 
+      <View style={tw`flex-row justify-between items-center bg-white p-3 shadow-sm`}>
+        <Text style={tw`text-xl font-medium`}>
+          Service Admin
+        </Text>
+        <TouchableOpacity>
+          <Menu size={22} />
+        </TouchableOpacity>
+      </View>
+      
+      <ScrollView style={tw`flex-1 mt-4`}>
+        <View>
+          <Text style={tw`text-lg font-medium mb-3`}>
+            Overview
+          </Text>
+          <View style={tw`flex-row justify-between mb-4 space-x-4`}>
+  <View style={tw`flex-1`}>
+    <StatCard
+      icon={<Wrench size={24} color="blue" />}
+      label="Services"
+      value={actualServiceCount}
+      onPress={() => navigation.navigate("ActualServices")}
+    />
+  </View>
+
+  <View style={tw`flex-1`}>
+    <StatCard
+      icon={<Tag size={24} color="green" />}
+      label="Service Options"
+      value={serviceOptionCount}
+      onPress={() => navigation.navigate("ServiceOptions")}
+    />
+  </View>
+</View>
+
+<View style={tw`flex-row justify-between mb-4`}>
+  <View style={tw`flex-1`}>
+    <StatCard
+      icon={<Tag size={24} color="green" />}
+      label="Promo Codes"
+      value={"10"}
+      onPress={() => navigation.navigate("PromoCodeList")}
+    />
+  </View>
+</View>
+
+        </View>
+        
+        <View>
+          <Text style={tw`text-lg font-medium mb-3`}>
+            Recent Services
+          </Text>
+          {sampleActualServices.map((service) => (
+            <TouchableOpacity
+              key={service._id}
+              style={tw`p-4 bg-white rounded-lg mb-2 shadow-sm`}
+              onPress={() => navigation.navigate("ServiceDetails", { id: service._id })}
+            >
+              <View style={tw`flex-row items-center gap-3`}>
+                <View style={tw`h-10 w-10 bg-blue-100 flex items-center justify-center rounded-full`}>
+                  <Wrench size={18} color="blue" />
+                </View>
+                <View>
+                  <Text style={tw`font-medium`}>
+                    {service.name}
+                  </Text>
+                  <Text style={tw`text-sm text-gray-500`}>
+                    {service.description || "No description provided"}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+      <View style={tw`bg-white p-4 text-center`}>
+        <Text style={tw`text-sm text-gray-500`}>
+          Service Admin Dashboard • v1.0
+        </Text>
+      </View>
+      </View>
   );
 };
+
+const StatCard = ({ icon, label, value, onPress }) => {
+  return (
+    <TouchableOpacity
+      style={tw`p-4 bg-white rounded-lg flex-1 items-center shadow-sm`}
+      onPress={onPress}
+    >
+      <View style={tw`mb-2`}>{icon}</View>
+      <Text style={tw`text-xl font-semibold`}>{value}</Text>
+      <Text style={tw`text-sm text-gray-500`}>{label}</Text>
+    </TouchableOpacity>
+  );
+};
+
+
+
 
 export default CategoryCreate;
