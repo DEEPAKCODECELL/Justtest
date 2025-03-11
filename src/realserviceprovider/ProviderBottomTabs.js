@@ -26,7 +26,7 @@ const ProviderBottomTabs = ({ setIsAuthenticated }) => {
     return <Text>Loading...</Text>; // Show loading while fetching role
   }
 
-  if (role !== "provider") {
+  if (role !== "ServiceProvider") {
     return <Text>Access Denied</Text>; // Restrict access for non-provider users
   }
 
