@@ -177,7 +177,7 @@ const handleapplypoints = () => {
         {/* Location Section */}
         <View style={tw`bg-white rounded-xl p-4 shadow-sm mb-4`}>
           <View style={tw`flex-row justify-between items-center`}>
-            <View style={tw`flex-row items-center space-x-3`}>
+            <View style={tw`flex-row items-center gap-3`}>
               <Home size={20} color="gray" />
               <Text style={tw`font-medium`}>{addessdata.slice(4,40)}</Text>
             </View>
@@ -249,7 +249,7 @@ const handleapplypoints = () => {
         onPress={() => setExpanded(!expanded)}
       >
         <View style={tw`flex-row justify-between items-center`}>
-          <View style={tw`flex-row items-center space-x-3`}>
+          <View style={tw`flex-row items-center gap-3`}>
             <View style={tw`p-4 bg-green-100 rounded-lg`}>
               {(promoCodeSuccess&&promoCode.length)?(<CheckCircle size={30} color="green" />):(<Percent size={30} color="green" />)}
             </View>
@@ -287,7 +287,7 @@ const handleapplypoints = () => {
           onPress={handleapplypoints}
         >
         <View style={tw`bg-white rounded-xl p-4 shadow-sm mb-4`}>
-          <View style={tw`flex-row items-center space-x-3`}>
+          <View style={tw`flex-row items-center gap-3`}>
             <View style={tw`p-4 bg-gray-100 rounded-lg`}>
               <CreditCard size={20} color="gray" />
             </View>
