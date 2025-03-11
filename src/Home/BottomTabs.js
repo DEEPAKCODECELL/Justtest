@@ -46,7 +46,7 @@ const BottomTabs =  ({ setIsAuthenticated }) => {
   if (isLoading) {
     return <Text>Loading...</Text>; // Show loading while fetching role
   }
-  if (role !== "user") {
+  if (role !== "User") {
     return <Text>Access Denied</Text>; // Restrict access for non-admin users
   }
   return (<Tab.Navigator
