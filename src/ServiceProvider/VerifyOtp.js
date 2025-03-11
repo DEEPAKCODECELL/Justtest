@@ -23,9 +23,10 @@ const VerifyOtp = ({setIsAuthenticated}) => {
   if (result.payload.success) {
     await AsyncStorage.setItem("authToken", result.payload.data.token);// Store token
     await AsyncStorage.setItem("role", result.payload.data.role);// Store role
-    console.log("toekn", result.payload.data.token)
-    if (result.payload.data.role != "admin") navigation.navigate("FetchAddress")
-    else navigation.navigate("CategoryCreate");
+    console.log("token", result.payload.data.token);
+    console.log("role", result.payload.data.role);
+    if (result.payload.data.role != "Admin") navigation.navigate("FetchAddress")
+    else navigation.navigate("AdminBottomTabs");
   } else {
     console.log("Login Failed");
   }
