@@ -11,9 +11,8 @@ import { updateUserLocation } from "../../redux/slices/userSlice";
 import { useDispatch } from "react-redux";
 import useAuthRole from "../../Hook/useAuthRole";
 
-const FetchAddress = () => {
-  const { role, isLoading: loadingfornow } = useAuthRole();
-  if(loadingfornow) return null;
+const FetchAddress = ({setIsAuthenticated}) => {
+  const [role, setRole] = useState(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [location, setLocation] = useState(null);
@@ -69,12 +68,10 @@ const FetchAddress = () => {
           console.log("Latitude:", latitude, "Longitude:", longitude);
           console.log("Need to set up address...");
           const result = await dispatch(updateUserLocation({ latitude, longitude }));
-          if (result && result.payload?.success) {
-            setIsLoading(false);
-            if (role == "user") navigation.navigate("BottomTabs");
-            else if (role == 'provider') navigation.navigate("ProviderBottomTabs");
-            else if (role == 'admin') navigation.navigate("AdminBottomTabs");
-          }
+          const storedRole = await AsyncStorage.getItem("role");
+          console.log("Stored Role is:", storedRole);
+          setRole(storedRole);
+          console.log("Role is:", role);
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -99,6 +96,22 @@ const FetchAddress = () => {
 
     fetchLocation();
   }, []);
+
+  useEffect(() => {
+    if (role === "User") {
+      navigation.navigate("BottomTabsUser");
+    }
+    if (role === "Admin") {
+      navigation.navigate("AdminBottomTabsUser");
+    }
+    if (role === "ServiceProvider") {
+      navigation.navigate("ProviderBottomTabsUser");
+    }
+    if (!role) {
+    console.warn("Role is still null, waiting...");
+      return;
+    }
+  },[role])
 
   return (
     <View style={tw`flex-1 bg-gray-100 justify-center items-center px-5`}>
