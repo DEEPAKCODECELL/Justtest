@@ -35,6 +35,18 @@ import { Payment } from "./src/Home/UserProfileList/Payment";
 import BookingScreen from "./src/Bookings/BookingScreen";
 import AdminBottomTabs from "./src/Admin/AdminBottomTabs";
 import ProviderBottomTabs from "./src/realserviceprovider/ProviderBottomTabs";
+import ActualServiceDetail from "./src/Admin/ActualServiceDetail";
+import ActualServiceList from "./src/Admin/ActualServiceList";
+import ServiceOptions from "./src/Admin/ServiceOptions";
+import ServiceDetails from "./src/Admin/ServiceDetails";
+import ServiceOptionDetail from "./src/Admin/ServiceOptionDetail";
+import ServiceOptionForm from "./src/Admin/ServiceOptionForm";
+import ServiceOptionList from "./src/Admin/ServiceOptionList";
+import ActualServiceForm from "./src/Admin/ActualServiceForm";
+import PromoCodeForm from "./src/Admin/PromoCode/PromoCodeForm";
+import PromoCodeDetails from "./src/Admin/PromoCode/PromoCodeDetails";
+import PromoCodeList from "./src/Admin/PromoCode/PromoCodeList";
+import ProviderDetails from "./src/Admin/ProviderDetails";
 
 
 const Stack = createStackNavigator();
@@ -69,15 +81,15 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
-  role === "user" ? (
+  role === "User" ? (
     <Stack.Screen name="BottomTabs">
       {() => <BottomTabs setIsAuthenticated={setIsAuthenticated} />}
     </Stack.Screen>
-  ) : role === "admin" ? (
+  ) : role === "Admin" ? (
     <Stack.Screen name="AdminBottomTabs">
       {() => <AdminBottomTabs setIsAuthenticated={setIsAuthenticated} />}
     </Stack.Screen>
-  ) : role === "provider" ? (
+  ) : role === "ServiceProvider" ? (
     <Stack.Screen name="ProviderBottomTabs">
       {() => <ProviderBottomTabs setIsAuthenticated={setIsAuthenticated} />}
     </Stack.Screen>
@@ -95,6 +107,21 @@ export default function App() {
         {/* Other screens */}
         <Stack.Screen name="VerifyOtp">
           {()=><VerifyOtp setIsAuthenticated={setIsAuthenticated}/>}
+        </Stack.Screen>
+        <Stack.Screen name="LoginAfterLogout">
+      {() => <Login setIsAuthenticated={setIsAuthenticated} />}
+    </Stack.Screen>
+        <Stack.Screen name="BottomTabsUser">
+      {() => <BottomTabs setIsAuthenticated={setIsAuthenticated} />}
+        </Stack.Screen>
+     <Stack.Screen name="AdminBottomTabsUser">
+      {() => <AdminBottomTabs setIsAuthenticated={setIsAuthenticated} />}
+    </Stack.Screen>   
+    <Stack.Screen name="ProviderBottomTabsUser">
+      {() => <ProviderBottomTabs setIsAuthenticated={setIsAuthenticated} />}
+    </Stack.Screen>
+        <Stack.Screen name="FetchAddress">
+          {()=><FetchAddress setIsAuthenticated={setIsAuthenticated}/>}
         </Stack.Screen>
         <Stack.Screen name="AddressScreen" component={AddressScreen} />
         <Stack.Screen name="ChooseService" component={ChooseService} />
@@ -117,11 +144,22 @@ export default function App() {
         <Stack.Screen name="UserProfile" component={UserProfile} />
         <Stack.Screen name="CategoryCreate" component={CategoryCreate} />
         <Stack.Screen name="LoadingBar" component={LoadingBar} />
-        <Stack.Screen name="FetchAddress" component={FetchAddress} />
         <Stack.Screen name="MapComponent" component={MapComponent} />
         <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
         <Stack.Screen name="Payment" component={Payment} />
-        <Stack.Screen name="BookingScreen" component={BookingScreen}/>
+        <Stack.Screen name="BookingScreen" component={BookingScreen} />
+        <Stack.Screen name="ActualServiceDetail" component={ActualServiceDetail} />
+        <Stack.Screen name="ActualServices" component={ActualServiceList} />
+        <Stack.Screen name="ServiceOptions" component={ServiceOptions} />
+        <Stack.Screen name="ServiceDetails" component={ServiceDetails} />
+        <Stack.Screen name="ActualServiceForm" component={ActualServiceForm} />
+        <Stack.Screen name="ServiceOptionForm" component={ServiceOptionForm} />
+        <Stack.Screen name="ServiceOptionList" component={ServiceOptionList} />
+        <Stack.Screen name="ServiceOptionDetail" component={ServiceOptionDetail} />
+        <Stack.Screen name="PromoCodeList" component={PromoCodeList} options={{ title: "Promo Codes" }} />
+      <Stack.Screen name="PromoCodeForm" component={PromoCodeForm} options={{ title: "Create/Edit Promo Code" }} />
+        <Stack.Screen name="PromoCodeDetails" component={PromoCodeDetails} options={{ title: "Promo Code Details" }} />
+        <Stack.Screen name="ProviderDetails" component={ProviderDetails} />
       </Stack.Navigator>
     </NavigationContainer>
   );
