@@ -8,6 +8,7 @@ export const loginUser = createAsyncThunk(
   async ({ phone }, { rejectWithValue }) => {
     try {
       console.log(`Accessing Phone in userSlice: ${phone}`);
+      console.log(`Base URL: ${apiClient.defaults.baseURL}`);
       const response = await apiClient.post("/auth/send-otp", { phone });
       console.log(response);
       return response.data; // Assuming API returns success response
