@@ -3,43 +3,37 @@ import { Alert, Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 import { request, PERMISSIONS, RESULTS } from "react-native-permissions";
 
-const useFetchLocationForProvider = (trigger) => {
+const useFetchLocationForProvider = (trigger,continous) => {
   const [location, setLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const requestLocationPermission = async () => {
-  try {
-    const permission =
-      Platform.OS === "android"
-        ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-        : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE;
+    try {
+      const permission =
+        Platform.OS === "android"
+          ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
+          : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE;
 
-    const result = await request(permission);
+      const result = await request(permission);
 
-    if (result === RESULTS.GRANTED) {
-      console.log("Location permission granted.");
-      Geolocation.getCurrentPosition(
-        (position) => {
-          console.log("Position:", position);
-        },
-        (error) => {
-          console.error("Location Error:", error);
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
-    } else {
-      Alert.alert("Permission Denied", "Location permission is required.");
+      if (result === RESULTS.GRANTED) {
+        console.log("Location permission granted.");
+        return true;
+      } else {
+        Alert.alert("Permission Denied", "Location permission is required.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Permission request error:", error);
+      return false;
     }
-  } catch (error) {
-    console.error("Permission request error:", error);
-  }
-};
+  };
 
   const fetchLocation = async () => {
-    const hasPermission = await requestPermission();
+    const hasPermission = await requestLocationPermission();
     if (!hasPermission) {
-      Alert.alert("Permission Denied", "Enable location access for a better experience.");
+      setError("Permission Denied");
       return;
     }
 
@@ -47,6 +41,7 @@ const useFetchLocationForProvider = (trigger) => {
       (position) => {
         const { latitude, longitude } = position.coords;
         setLocation({ latitude, longitude });
+        setError(null);
       },
       (err) => {
         console.error("Location error:", err);
@@ -61,7 +56,9 @@ const useFetchLocationForProvider = (trigger) => {
 
     setIsLoading(true);
     fetchLocation(); // Initial fetch
-
+    if (continous == false) {
+      return;
+    }
     const interval = setInterval(() => {
       fetchLocation();
     }, 5000); // Fetch location every 5 seconds
