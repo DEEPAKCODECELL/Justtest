@@ -1,16 +1,111 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Animated } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import tw from "twrnc";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProviderDetails, verifyAadhaar, verifyAadhaarOTP } from "../redux/slices/ProviderSlice";
+import { CheckCircleIcon } from "lucide-react-native";
+import LoadingBar from "./components/LoadingBar";
 
-export default function WorkDetailsScreen() {
+
+export default function WorkDetailsScreen({ onClose, ageGroup, setAgeGroup, selectedService,adhadharCard, setAdhadharCard,selectedId
+            ,otp, setOtp, isOtpVerified, setIsOptVerified }) {
+  const slideAnim = useRef(new Animated.Value(100)).current;
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
-  const route = useRoute();
-  const { selectedService } = route.params || {}; // Get selected service
+  const {loading} = useSelector((state) => state?.provider);
+  console.log(loading);
 
-  const [experience, setExperience] = useState(null);
-  const [ageGroup, setAgeGroup] = useState(null);
+  const [aadhaarVerificationStatus, setAadhaarVerificationStatus] = useState(null);
+  const [otpStatus, setOtpStatus] = useState(null);
 
+  useEffect(() => {
+    return () => {
+      // Cleanup: Reset all states when component unmounts
+      setOtpStatus(null);
+      setAadhaarVerificationStatus(null);
+      setIsLoading(false);
+    };
+  }, []);
+
+  // Function to format Aadhaar card number as the user types (16 digits)
+  const formatAadhaarCard = (input) => {
+    // Remove non-numeric characters
+    let cleanInput = input.replace(/\D/g, "");
+
+    // Format the input into chunks of 4 digits (for 16-digit Aadhaar number)
+    if (cleanInput.length <= 16) {
+      cleanInput = cleanInput.replace(/(\d{4})(?=\d)/g, "$1-");
+    }
+
+    return cleanInput;
+  };
+
+  // Function to handle Aadhaar card input change
+  const handleAadhaarCardChange = (text) => {
+    const formattedText = formatAadhaarCard(text);
+    setAdhadharCard(formattedText);
+  };
+
+  // Function to handle Aadhaar card verification
+  const handleAadhaarVerification = async () => {
+    if (!adhadharCard) {
+      alert("Please enter your Aadhaar card number.");
+      return;
+    }
+
+    try {
+      const response = await dispatch(verifyAadhaar(adhadharCard.replace(/-/g, "")));
+      if (response.payload.success) {
+        setAadhaarVerificationStatus("Aadhaar card verified successfully!");
+      } else {
+        setAadhaarVerificationStatus("Invalid Aadhaar card.");
+      }
+    } catch (error) {
+      setAadhaarVerificationStatus("Aadhaar verification failed.");
+    }
+  };
+  const MakeProviderVerified = async () => {
+    setIsLoading(true);
+    console.log("called",selectedId, ageGroup, adhadharCard);
+    const response = await dispatch(updateProviderDetails({ selectedId, ageGroup, adhadharCard:adhadharCard.replace(/-/g, ""),status:"verified" }));
+    console.log("check check response check", response);
+    setIsLoading(false);
+  }
+  // Function to verify OTP
+  const handleOtpVerification = async () => {
+    if (!otp) {
+      alert("Please enter the OTP.");
+      return;
+    }
+    try {
+      const response = await dispatch(verifyAadhaarOTP({
+        aadhaarNumber: adhadharCard.replace(/-/g, ""), // Remove hyphens before sending
+        otp
+      }));
+
+      if (response) {
+        setIsOptVerified(true);
+        // alert("OTP verified successfully!");
+        console.log("called Make");
+        await MakeProviderVerified();
+      } else {
+        setOtpStatus("Invalid OTP.");
+      }
+    } catch (error) {
+      console.log(error.message);
+      setOtpStatus("OTP verification failed.");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <>
+      <LoadingBar loading={isLoading}/>
+      </>
+    )
+  }
   return (
     <ScrollView
       style={tw`bg-white h-full px-4 pt-6`}
@@ -39,65 +134,85 @@ export default function WorkDetailsScreen() {
           style={tw`bg-gray-100 p-4 rounded-lg border border-gray-300 mb-4`}
         >
           <Text style={tw`text-base font-semibold text-gray-900 mb-3`}>
-            Do you have any experience in {selectedService}?
+             You Selected {selectedService.length > 0 ? selectedService.join(", ") : "these services"}
           </Text>
-          {["Yes", "No"].map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={tw`flex-row items-center py-3 border-b border-gray-300`}
-              onPress={() => setExperience(option)}
-            >
-              <Text style={tw`text-base text-gray-800 flex-1`}>{option}</Text>
-              <View
-                style={tw`w-5 h-5 border-2 rounded-full ${
-                  experience === option
-                    ? "border-blue-500 bg-blue-500"
-                    : "border-gray-400"
-                }`}
-              />
-            </TouchableOpacity>
-          ))}
         </View>
 
         {/* Age Group Section */}
-        <View
-          style={tw`bg-gray-100 p-4 rounded-lg border border-gray-300 mb-6`}
-        >
-          <Text style={tw`text-base font-semibold text-gray-900 mb-3`}>
-            What is your age?
-          </Text>
-          {["Less than 18 years", "18-45 Years", "More than 45 Years"].map(
-            (option, index) => (
-              <TouchableOpacity
-                key={index}
-                style={tw`flex-row items-center py-3 border-b border-gray-300`}
-                onPress={() => setAgeGroup(option)}
-              >
-                <Text style={tw`text-base text-gray-800 flex-1`}>{option}</Text>
-                <View
-                  style={tw`w-5 h-5 border-2 rounded-full ${
-                    ageGroup === option
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-gray-400"
-                  }`}
-                />
-              </TouchableOpacity>
-            )
-          )}
-        </View>
+       <View style={tw`bg-gray-100 p-4 rounded-lg border border-gray-300 mb-6`}>
+  <Text style={tw`text-base font-semibold text-gray-900 mb-3`}>
+    What is your age?
+  </Text>
 
-        {/* Continue Button */}
+  <View style={tw`flex-row items-center py-3 border-b border-gray-300`}>
+    <TextInput
+      style={tw`flex-1 text-base text-gray-800 bg-white px-4 py-2 rounded-lg border border-gray-400`}
+      placeholder="Enter your age"
+      placeholderTextColor="#888"
+      keyboardType="numeric"
+      value={ageGroup}
+      onChangeText={(text) => setAgeGroup(text)}
+    />
+          </View>
+     <Text style={tw`text-base font-semibold text-gray-900 mb-3`}>
+        Enter Aadhaar card
+      </Text>
+
+      {/* Aadhaar Card Input */}
+      <View style={tw`flex-row items-center py-3 border-b border-gray-300`}>
+        <TextInput
+          placeholder="Enter Aadhaar Card Number"
+          value={adhadharCard}
+          onChangeText={handleAadhaarCardChange}
+          style={tw`flex-1 text-base text-gray-800 bg-white px-4 py-4 rounded-lg border border-gray-400`}
+          maxLength={19} // Max length of Aadhaar number with hyphens (16 digits + 3 hyphens)
+          keyboardType="numeric"
+          editable={aadhaarVerificationStatus !== "Aadhaar card verified successfully!"}    
+        />
+      </View>
+
+      {/* Verify Aadhaar Button */}
+          {aadhaarVerificationStatus!="Aadhaar card verified successfully!"&&<TouchableOpacity
+            style={tw`bg-blue-500 px-5 py-3 rounded-lg shadow-md w-full justify-center items-center mb-3`}
+            onPress={handleAadhaarVerification}
+          >
+            <Text style={tw`text-white text-lg font-semibold`}>Verify Aadhaar</Text>
+          </TouchableOpacity>}
+
+      {/* OTP Input */}
+          {aadhaarVerificationStatus === "Aadhaar card verified successfully!" && (
+            <>
+              <Text style={tw`text-base font-semibold text-gray-900 mb-3`}>
+        Enter Otp
+      </Text>
+        <View style={tw`w-full bg-white p-3 rounded-xl shadow-md mb-3`}>
+          <TextInput
+            placeholder="Enter OTP"
+            value={otp}
+            onChangeText={setOtp}
+            style={tw`text-lg text-gray-700`}
+            keyboardType="numeric"
+          />
+        </View>
+            </>
+      )}
+
+      {/* Verify OTP Button */}
+      {aadhaarVerificationStatus === "Aadhaar card verified successfully!" && (
         <TouchableOpacity
-          style={tw`bg-blue-600 py-3 rounded-lg ${
-            experience && ageGroup ? "" : "opacity-50"
-          }`}
-          disabled={!experience || !ageGroup}
-          onPress={() => navigation.navigate("WorkLocation")} // Replace with actual screen name
+          style={tw`bg-green-500 px-5 py-3 rounded-lg shadow-md w-full justify-center items-center mb-3`}
+          onPress={handleOtpVerification}
         >
-          <Text style={tw`text-white text-center text-lg font-semibold`}>
-            Continue
-          </Text>
+          <Text style={tw`text-white text-lg font-semibold`}>Verify OTP</Text>
         </TouchableOpacity>
+      )}
+
+      {/* Status Message */}
+      {otpStatus && <Text style={tw`text-center text-red-600`}>{otpStatus}</Text>}
+      {aadhaarVerificationStatus && (
+        <Text style={tw`text-center text-green-600`}>{aadhaarVerificationStatus}</Text>
+      )}
+</View>
       </View>
     </ScrollView>
   );
