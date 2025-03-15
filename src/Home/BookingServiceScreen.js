@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, TouchableOpacity, FlatList,ScrollView } from "react-native";
 import tw from "../../tailwind";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { ArrowLeft } from "lucide-react-native";
@@ -25,6 +25,8 @@ const ChooseService = () => {
   const [dates, setDates] = useState([]);
   const [durations, setDurations] = useState([]);
   const [isPM, setIsPM] = useState(false);
+  const [isAm, setIsAm] = useState(false);
+  const [existingBooking, setExistingBooking] = useState(null);
 
   const times = useMemo(() => [
     "12:00", "12:30", "01:00", "01:30", "02:00", "02:30",
@@ -54,58 +56,71 @@ const ChooseService = () => {
         formattedDate: formattedIterDate, // Now it's "YYYY-MM-DDT00:00:00.000Z"
       });
     }
-
     setDates(currentDates);
-    setSelectedDate(currentDates[0]?.formattedDate);
+    setSelectedDate((prevDate) =>
+    prevDate && currentDates.some((d) => d.formattedDate === prevDate)
+      ? prevDate
+      : currentDates[0]?.formattedDate
+    );
   }, []);
 
-  const generateTimeSlots = () => {
-    const now = new Date();
-    const currentMinutes = now.getMinutes();
-    const currentHours = now.getHours();
+  const generateTimeSlots = (selectedDate) => {
+  const now = new Date(selectedDate);
+  
+  // Set start time to 8:00 AM
+  const startTime = new Date(now);
+  startTime.setHours(8, 0, 0, 0);
 
-    // Calculate the next 15-minute interval
-    const nextInterval = 15 - (currentMinutes % 15);
-    let startTime = new Date(now);
-    startTime.setMinutes(currentMinutes + nextInterval);
-    startTime.setSeconds(0);
-    startTime.setMilliseconds(0);
+  // Set end time to 8:00 PM
+  const endTime = new Date(now);
+  endTime.setHours(20, 0, 0, 0);
 
-    const timeSlots = [];
-    const endTime = new Date(startTime);
-    endTime.setHours(24, 0, 0, 0); // Set end time to 24:00 (end of the day)
+  const timeSlots = [];
 
-    while (startTime < endTime) {
-      const formattedIterDate2 = startTime;
-      console.log("diff", formattedIterDate2);
-      const formattedTime = startTime.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true, // Use 12-hour format
-      });
-      timeSlots.push({ time: formattedTime,formattedIterDate: formattedIterDate2 });
-      startTime.setMinutes(startTime.getMinutes() + 15); // Increment by 15 minutes
-    }
-
-    return timeSlots;
-  };
-  const organizeTimeSlots = (timeSlots) => {
-    const amSlots = [];
-    const pmSlots = [];
-
-    timeSlots.forEach((slot) => {
-      const [hour] = slot.time.split(':');
-      if (parseInt(hour) < 12 || slot.time.includes('AM')) {
-        amSlots.push(slot);
-      } else {
-        pmSlots.push(slot);
-      }
+  while (startTime < endTime) {
+    const formattedIterDate = new Date(startTime); // Create a new Date instance
+    
+    const formattedTime = formattedIterDate.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true, // Use 12-hour format
     });
 
-    return { amSlots, pmSlots };
-  };
-  const timeSlots = useMemo(() => generateTimeSlots(selectedDate), [selectedDate]);
-  const { amSlots, pmSlots } = useMemo(() => organizeTimeSlots(timeSlots), [timeSlots]);
+    console.log("Generated Slot:", formattedIterDate); // Debugging Output
+
+    timeSlots.push({ time: formattedTime, formattedIterDate });
+
+    // Increment start time by 15 minutes
+    startTime.setMinutes(startTime.getMinutes() + 15);
+  }
+
+  return timeSlots;
+};
+
+
+  const organizeTimeSlots = (timeSlots) => {
+  const amSlots = [];
+  const pmSlots = [];
+
+  timeSlots.forEach((slot) => {
+    const [hour, minute] = slot.time.split(":").map(Number); // Convert to number
+    const isAM = slot.time.includes("AM");
+    const isPM = slot.time.includes("PM");
+
+    if (isAM || (hour < 12 && !isPM)) {
+      amSlots.push(slot);
+    } else {
+      pmSlots.push(slot);
+    }
+  });
+
+  return { amSlots, pmSlots };
+};
+
+// Memoized value
+const timeSlots = useMemo(() => generateTimeSlots(selectedDate), [selectedDate]);
+const { amSlots, pmSlots } = useMemo(() => organizeTimeSlots(timeSlots), [timeSlots]);
+
 
   const fetchServiceData = useCallback(async () => {
     if (!serviceId || userlatlong.length < 2) return;
@@ -161,7 +176,7 @@ const ChooseService = () => {
   useEffect(() => {
     generateNextDays();
     fetchServiceData();
-  }, [fetchServiceData, generateNextDays]);
+  }, [selectedDate]);
 
   if (loading) {
     return (
@@ -193,7 +208,14 @@ const ChooseService = () => {
             <TouchableOpacity
               style={tw`items-center px-4 py-3 mx-2 rounded-lg border ${selectedDate === item.formattedDate ? "bg-purple-600 border-purple-600" : "border-gray-300"
                 }`}
-              onPress={() => { console.log("select date ", item.formattedDate); setSelectedDate(item.formattedDate) }}
+              onPress={() => {
+  console.log("Select date:", item.formattedDate);
+  console.log("Current selected date:", selectedDate, "New date:", item.formattedDate);
+
+  if (selectedDate !== item.formattedDate) {
+    setSelectedDate(item.formattedDate);
+  }
+}}
             >
               <Text style={tw`text-center text-sm ${selectedDate === item.formattedDate ? "text-white font-bold" : "text-gray-500"}`}>
                 {item.day.toUpperCase()}
@@ -220,97 +242,106 @@ const ChooseService = () => {
               style={tw`px-4 py-3 mx-2 rounded-lg border ${
                 selectedDuration === item.duration ? "bg-purple-200 border-purple-600" : "border-gray-300"
               }`}
-              onPress={() => { setSelectedDuration(item.duration); setserviceOptionId(item._id); }}
+              onPress={() => {
+  console.log("Selected duration:", selectedDuration, "New duration:", item.duration);
+  console.log("Selected service option ID:", serviceOptionId, "New ID:", item._id);
+
+  if (selectedDuration !== item.duration) {
+    setSelectedDuration(item.duration);
+  }
+
+  if (serviceOptionId !== item._id) {
+    setserviceOptionId(item._id);
+  }
+}}
             >
               <Text style={tw`text-center ${selectedDuration === item.duration ? "text-purple-800 font-bold" : "text-gray-600"}`}>
                 {item.duration} mins
               </Text>
-              <Text style={tw`text-center text-gray-400 line-through`}>₹{item.price}</Text>
-              <Text style={tw`text-center text-black font-bold`}>₹{item.price - item.discount_price}</Text>
+              <Text style={tw`text-center text-gray-400 line-through`}>₹{Math.ceil((item.price)/100)}</Text>
+              <Text style={tw`text-center text-black font-bold`}>₹{Math.ceil((item.price - item.discount_price)/100)}</Text>
             </TouchableOpacity>
           )}
         />
       </View>
-
-      {/* Time Selection */}
       {isScheduled && (
-        <View style={tw`mt-5 border-2 border-gray-300 rounded`}>
-          <Text style={tw`text-lg font-semibold mb-2 mt-5`}>Select start time of service</Text>
-          <View style={tw`flex-row justify-center mb-2`}>
-            <TouchableOpacity
-              style={tw`px-4 py-2 rounded-lg border ${!isPM ? "bg-purple-600" : "border-gray-300"}`}
-              onPress={() => setIsPM(false)}
-            >
-              <Text style={tw`${!isPM ? "text-white" : "text-black"}`}>AM</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={tw`px-4 py-2 ml-2 rounded-lg border ${isPM ? "bg-purple-600" : "border-gray-300"}`}
-              onPress={() => setIsPM(true)}
-            >
-              <Text style={tw`${isPM ? "text-white" : "text-black"}`}>PM</Text>
-            </TouchableOpacity>
-          </View>
-        </View> && <View style={tw`bg-white rounded-lg p-6 mb-5 shadow-sm border-2 border-gray-300 animate-fade-in-up mt-5`}>
+  <ScrollView style={tw`mt-5`} keyboardShouldPersistTaps="handled">
+    {/* Time Slot Selection */}
+    <View style={tw`bg-white rounded-lg p-6 mb-5 shadow-sm border-2 border-gray-300 mt-5`}>
       <View style={tw`flex-row items-center justify-between mb-6`}>
         <Text style={tw`text-lg font-medium`}>Select start time of service</Text>
-        <View style={tw`bg-gray-100 flex-row rounded-lg overflow-hidden`}>
-          <TouchableOpacity
-            onPress={() => setIsPM(false)}
-            style={tw`px-6 py-2 ${isPM ==true ? "bg-transparent" : "bg-white font-medium"}`}
-          >
-            <Text>AM</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setIsPM(true)}
-            style={tw`px-6 py-2 ${isPM==true ? "bg-transparent" : "bg-white font-medium"}`}
-          >
-            <Text>PM</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={tw`flex-row flex-wrap gap-3`}>
-  {isPM ? (
-    pmSlots.length > 0 ? (
-      pmSlots.map((time,index) => (
-        <TouchableOpacity
-          key={index}
-          onPress={() => setSelectedTime(time.formattedIterDate)}
-          style={tw`px-4 py-2 border rounded ${selectedTime === time.formattedIterDate ? "bg-purple-600 border-purple-600" : "border-gray-300"} border-gray-300`}
-        >
-          <Text>{time.time}</Text>
-        </TouchableOpacity>
-      ))
-    ) : (
-      <Text style={tw`text-red-500 font-semibold`}>Getting High Demand In Your Area</Text>
-    )
-  ) : amSlots.length > 0 ? (
-    amSlots.map((time,index) => (
-      <TouchableOpacity
-        key={index}
-        onPress={() => setSelectedTime(time.formattedIterDate)}
-        style={tw`px-4 py-2 border rounded ${selectedTime === time.formattedIterDate ? "bg-purple-600 border-purple-600" : "border-gray-300"} border-gray-300`}
-      >
-        <Text>{time.time}</Text>
-      </TouchableOpacity>
-    ))
-  ) : (
-    <Text style={tw`text-red-500 font-semibold`}>Getting High Demand In Your Area</Text>
-  )}
+
+        {/* AM / PM Switch */}
+       <View style={tw`bg-gray-100 flex-row rounded-lg overflow-hidden`}>
+  <TouchableOpacity
+    onPress={() => { setIsAm(true); setIsPM(false); }}
+    style={tw`px-6 py-2 ${isAm ? "bg-white" : "bg-transparent"}`}
+  >
+    <Text style={tw`${isAm ? "text-purple-800 font-bold" : "text-gray-600"}`}>AM</Text>
+  </TouchableOpacity>
+  <TouchableOpacity
+    onPress={() => { setIsPM(true); setIsAm(false); }}
+    style={tw`px-6 py-2 ${isPM ? "bg-white" : "bg-transparent"}`}
+  >
+    <Text style={tw`${isPM ? "text-purple-800 font-bold" : "text-gray-600"}`}>PM</Text>
+  </TouchableOpacity>
 </View>
 
-    </View>
+      </View>
+
+      {/* Time Slots (Scroll-enabled) */}
+      <ScrollView horizontal={false} showsVerticalScrollIndicator={false}>
+  <ScrollView style={tw`max-h-60`} showsVerticalScrollIndicator={false}>
+    <View style={tw`flex-row flex-wrap justify-between gap-3`}>
+      {isPM ? (
+        pmSlots.length > 0 ? (
+          pmSlots.map((time, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => setSelectedTime(time.formattedIterDate)}
+              style={tw`px-4 py-2 border rounded w-24 ${
+                selectedTime === time.formattedIterDate ? "bg-purple-600 border-purple-600" : "border-gray-300"
+              }`}
+            >
+              <Text style={tw`${selectedTime === time.formattedIterDate ? "text-white" : "text-black"} text-center`}>{time.time}</Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text style={tw`text-red-500 font-semibold text-center w-full`}>Getting High Demand In Your Area</Text>
+        )
+      ) : amSlots.length > 0 ? (
+        amSlots.map((time, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => {
+              console.log("am data check",time.time,selectedTime)
+              setSelectedTime(time.formattedIterDate);
+            }}
+            style={tw`px-4 py-2 border rounded w-24 ${
+              selectedTime === time.formattedIterDate ? "bg-purple-600 border-purple-600" : "border-gray-300"
+            }`}
+          >
+            <Text style={tw`${selectedTime === time.formattedIterDate ? "text-white" : "text-black"} text-center`}>{time.time}</Text>
+          </TouchableOpacity>
+        ))
+      ) : (
+        <Text style={tw`text-red-500 font-semibold text-center w-full`}>Getting High Demand In Your Area</Text>
       )}
+    </View>
+  </ScrollView>
+</ScrollView>
+
+    </View>
+  </ScrollView>
+)}
 
       {/* Confirm Button */}
       <View style={tw`absolute bottom-0 left-0 right-0 bg-white p-5 border-t border-gray-200`}>
         <View style={tw`flex-row justify-between items-center`}>
-          <Text style={tw`text-lg font-semibold`}>
+          {selectedDuration&&<Text style={tw`text-lg font-semibold`}>
             ₹
-            <Text style={tw`text-gray-400 line-through`}>
-              {durations.find(d => d.duration === selectedDuration)?.oldPrice}
-            </Text>
-            {durations.find(d => d.duration === selectedDuration)?.price}
-          </Text>
+            {Math.ceil((durations.find(d => d.duration === selectedDuration)?.price - durations.find(d => d.duration === selectedDuration)?.discount_price) / 100)}
+          </Text>}
           <TouchableOpacity style={tw`bg-purple-600 px-6 py-3 rounded-lg`} onPress={() =>handleBookings()}>
             <Text style={tw`text-white font-semibold`}>Confirm booking</Text>
           </TouchableOpacity>
