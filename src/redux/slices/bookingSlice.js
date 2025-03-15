@@ -77,20 +77,24 @@ export const applyPromoCode = createAsyncThunk(
   }
 );
 
-export const makeBooking = createAsyncThunk(
-  "booking/make",
-    async({modeOfPayment, pointsUsed, bookingId, location,status,showFinalPrice} ,{ rejectWithValue }) => {
+export const getFullBookingDetails = createAsyncThunk(
+  "booking/getFullDetails",
+  async ({ BookingId }, { rejectWithValue }) => {
     try {
-      console.log("Making a new booking...",modeOfPayment,pointsUsed,bookingId,location,status);
-      const response = await apiClient.post("/booking/confirm-booking",{modeOfPayment:modeOfPayment, pointsUsed:pointsUsed, bookingId:bookingId, address:location,status:status,finalPrice:showFinalPrice});
-      console.log("Booking successful:", response);
+      console.log("Fetching booking details for transactionId:", BookingId);
+
+      const response = await apiClient.post("/booking/confirm-booking-details", {
+        BookingId,
+      });
+      console.log("Full Booking Details:", response.data);
       return response.data;
     } catch (error) {
-      console.error("Error making booking:", error);
-      return rejectWithValue(error.response?.data || "Failed to create booking");
+      console.error("Error fetching booking details:", error);
+      return rejectWithValue(error.response?.data || "Failed to fetch booking details");
     }
   }
 );
+
 
 export const fetchBookingDetails = createAsyncThunk(
   "booking/fetchBookingDetails",
@@ -115,6 +119,7 @@ const bookingSlice = createSlice({
     promocodediscount:0,
     error: null,
     bookingDetails: {},
+    ConfirmbookingDetails: null
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -182,20 +187,6 @@ const bookingSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(makeBooking.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      // Handle booking success
-      .addCase(makeBooking.fulfilled, (state, action) => {
-        state.loading = false;
-        state.bookings.push(action.payload); // Add new booking to state
-      })
-      // Handle booking failure
-      .addCase(makeBooking.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
       .addCase(fetchBookingDetails.pending, (state) => {
         state.loading = true;
       })
@@ -206,6 +197,18 @@ const bookingSlice = createSlice({
       .addCase(fetchBookingDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(getFullBookingDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getFullBookingDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.ConfirmbookingDetails = action.payload;
+      })
+      .addCase(getFullBookingDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch booking details";
       });
   },
 });
