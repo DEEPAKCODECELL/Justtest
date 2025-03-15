@@ -10,8 +10,6 @@ import ReviewBookingPage from "./src/Bookings/ReviewBookingPage";
 import ActualProfile from "./src/profile/ActualProfile";
 import Policies from "./src/profile/Policies";
 import TermsAndConditions from "./src/profile/Docs/TermAndCondition";
-import BookingHistory from "./src/Order/BookingHistory";
-import OrderDetails from "./src/Order/OrderDetails";
 import FAQCategory from "./src/Home/UserProfileList/FAQ/FAQCategory";
 import FAQs from "./src/Home/UserProfileList/FAQ/FAQScreen";
 import ProfileSetup from "./src/ServiceProvider/ProfileSetup";
@@ -39,7 +37,6 @@ import ActualServiceDetail from "./src/Admin/ActualServiceDetail";
 import ActualServiceList from "./src/Admin/ActualServiceList";
 import ServiceOptions from "./src/Admin/ServiceOptions";
 import ServiceDetails from "./src/Admin/ServiceDetails";
-import ServiceOptionDetail from "./src/Admin/ServiceOptionDetail";
 import ServiceOptionForm from "./src/Admin/ServiceOptionForm";
 import ServiceOptionList from "./src/Admin/ServiceOptionList";
 import ActualServiceForm from "./src/Admin/ActualServiceForm";
@@ -47,10 +44,12 @@ import PromoCodeForm from "./src/Admin/PromoCode/PromoCodeForm";
 import PromoCodeDetails from "./src/Admin/PromoCode/PromoCodeDetails";
 import PromoCodeList from "./src/Admin/PromoCode/PromoCodeList";
 import ProviderDetails from "./src/Admin/ProviderDetails";
-
+import BookingDetails from "./src/Bookings/BookingDetailsScreen";
+import BookingSuccess from "./src/Bookings/BookingSuccess";
+import VerifyPaymentPage from "./src/Bookings/VerifyPaymentPage";
+import PaymentFailure from "./src/Bookings/PaymentFailure";
 
 const Stack = createStackNavigator();
-
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -129,8 +128,6 @@ export default function App() {
         <Stack.Screen name="Policies" component={Policies} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions}/>
         <Stack.Screen name="ReviewBookingPage" component={ReviewBookingPage} />
-        <Stack.Screen name="BookingHistory" component={BookingHistory} />
-        <Stack.Screen name="OrderDetails" component={OrderDetails} />
         <Stack.Screen name="FAQs" component={FAQs} />
         <Stack.Screen name="FAQCategory" component={FAQCategory} />
         <Stack.Screen name="ProfileSetup" component={ProfileSetup} />
@@ -155,11 +152,14 @@ export default function App() {
         <Stack.Screen name="ActualServiceForm" component={ActualServiceForm} />
         <Stack.Screen name="ServiceOptionForm" component={ServiceOptionForm} />
         <Stack.Screen name="ServiceOptionList" component={ServiceOptionList} />
-        <Stack.Screen name="ServiceOptionDetail" component={ServiceOptionDetail} />
         <Stack.Screen name="PromoCodeList" component={PromoCodeList} options={{ title: "Promo Codes" }} />
       <Stack.Screen name="PromoCodeForm" component={PromoCodeForm} options={{ title: "Create/Edit Promo Code" }} />
         <Stack.Screen name="PromoCodeDetails" component={PromoCodeDetails} options={{ title: "Promo Code Details" }} />
         <Stack.Screen name="ProviderDetails" component={ProviderDetails} />
+        <Stack.Screen name="BookingDetails" component={BookingDetails} />
+        <Stack.Screen name="BookingSuccess" component={BookingSuccess} />
+        <Stack.Screen name="VerifyPaymentPage" component={VerifyPaymentPage} />
+        <Stack.Screen name="PaymentFailure" component={PaymentFailure} />
       </Stack.Navigator>
     </NavigationContainer>
   );
