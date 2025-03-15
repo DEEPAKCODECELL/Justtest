@@ -5,7 +5,6 @@ import { request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { updateUserLocation } from "../redux/slices/userSlice";
-import Toast from "react-native-toast-message";
 const useFetchLocation = (trigger) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
