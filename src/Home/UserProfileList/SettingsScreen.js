@@ -6,29 +6,21 @@ import { Dimensions } from "react-native";
 import { logoutUser } from "../../redux/slices/userSlice";
 import { useDispatch } from "react-redux";
 const { width } = Dimensions.get("window");
+import { ChevronLeft } from "lucide-react-native";
 
 const settingsOptions = [
   { id: 1, title: "Profile", subtitle: "Update personal information", route: "ActualProfile" },
-  { id: 30, title: "Payments", subtitle: "Payments", route: "Payment" },
-  { id: 3, title: "Addresses", subtitle: "Manage saved addresses", route: "AddressScreen" },
-  {id: 18,title:"FetchAddress",subtitle:"FetchAddress", route:"FetchAddress"},
   { id: 4, title: "Refer And Earn", subtitle: "Earn Money For Referral", route: "Refer" },
   { id: 5, title: "Policies", subtitle: "Terms of Use, Privacy Policy and others", route: "Policies" },
   { id: 6, title: "Help & support", subtitle: "Reach out in case you have a question", route: "HelpAndSupport" },
-  { id: 7, title: "BookingHistory", subtitle: "Reach out in case you have a question", route: "BookingHistory" },
-  { id: 8, title: "OrderDetails", subtitle: "Reach out in case you have a question", route: "OrderDetails" },
   { id: 9, title: "FAQs", subtitle: "Reach out in case you have a question", route: "FAQs" },
   { id: 10, title: "FAQCategory", subtitle: "Reach out in case you have a question", route: "FAQCategory" },
-  { id: 12, title: "ProfileSetup", subtitle: "Reach out in case you have a question", route: "ProfileSetup" },
-  { id: 13, title: "ServiceSelection", subtitle: "Reach out in case you have a question", route: "ServiceSelection" },
-  { id: 14, title: "LocationSelection", subtitle: "Reach out in case you have a question", route: "LocationSelection" },
-  { id: 15, title: "WorkDetails", subtitle: "Reach out in case you have a question", route: "WorkDetails" },
-  { id: 16, title: "WorkLocation", subtitle: "Reach out in case you have a question", route: "WorkLocation" },
-  { id: 17, title: "HomeProvider", subtitle: "Reach out in case you have a question", route: "HomeProvider" },
-  { id: 19, title: "Category", subtitle: "Admin Create Category", route: "CategoryCreate" },
-  { id: 20, title: "LoadingBar", subtitle: "LoadingBar", route: "LoadingBar" },
-  {id:21,title:"MapComponent", subtitle:"MapComponent", route:"MapComponent"}
 ]
+
+const settingsOptionsProvider = [
+   
+]
+
 
 const SettingsScreen = ({setIsAuthenticated}) => {
   const navigation = useNavigation(); 
@@ -47,7 +39,12 @@ const SettingsScreen = ({setIsAuthenticated}) => {
 };
   return (
     <View style={[tw`flex-1 bg-white p-4`, { width }]}>
-      <Text style={tw`text-xl font-bold mb-4`}>Settings</Text>
+      <View style={tw`flex-row items-center h-16  bg-white border-b border-gray-200`}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={tw`p-2 rounded-full bg-gray-100`}>
+          <ChevronLeft size={24} />
+        </TouchableOpacity>
+        <Text style={tw`text-xl font-medium ml-4`}>Settings</Text>
+      </View>
 
       <FlatList
         showsVerticalScrollIndicator={false}
@@ -69,11 +66,6 @@ const SettingsScreen = ({setIsAuthenticated}) => {
       <TouchableOpacity style={tw`mt-6 p-4 bg-red-500 rounded-lg`} onPress={handleLogout}>
         <Text style={tw`text-center text-white font-bold`}>Log out</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity style={tw`mt-4 p-4 border border-red-500 rounded-lg`} onPress={() =>console.log("Logout")}>
-        <Text style={tw`text-center text-red-500 font-bold`}>Delete my data</Text>
-      </TouchableOpacity>
-
       <Text style={tw`text-center text-gray-400 mt-6`}>App version 1.0.9</Text>
     </View>
   );
