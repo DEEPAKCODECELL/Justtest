@@ -6,6 +6,8 @@ import Svg, { Circle, Path, Rect } from "react-native-svg";
 import BookingScreen from "../Bookings/BookingScreen";
 import useAuthRole from "../Hook/useAuthRole";
 import { Text } from "react-native";
+import useWebSocket from "../Hook/GetRealtimeLocation";
+import { useSelector } from "react-redux";
 const Tab = createBottomTabNavigator();
 
 const HomeIcon = ({ size = 24, color = "black" }) => (
@@ -41,7 +43,10 @@ const BookingIcon = ({ size = 24, color = "black" }) => (
   </Svg>
 );
 
-const BottomTabs =  ({ setIsAuthenticated }) => {
+const BottomTabs = ({ setIsAuthenticated }) => {
+  const user_id = useSelector((state) => state?.user?.user?.data?._id);
+  console.log("userid", user_id);
+  const socket=useWebSocket("http://192.168.173.18:4000",user_id)
   const { role, isLoading } = useAuthRole();
   if (isLoading) {
     return <Text>Loading...</Text>; // Show loading while fetching role
