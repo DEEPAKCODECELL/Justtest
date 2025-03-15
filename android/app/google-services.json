@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "774122974945",
+    "project_id": "pushnotification-2c3fe",
+    "storage_bucket": "pushnotification-2c3fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774122974945:android:1361e113ab95ee82da11a0",
+        "android_client_info": {
+          "package_name": "com.mynewapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDtuesawobC5X8kyjNPRuGhf0fiavP7JM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
