@@ -1,51 +1,47 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Animated, Easing } from "react-native";
 import tw from "../../../tailwind";
 
-const LoadingBar = ({loading}) => {
-    const progress = useRef(new Animated.Value(0)).current;
+const LoadingBar = ({ loading }) => {
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     if (loading) {
-      progress.setValue(0); // Reset animation
       Animated.loop(
-        Animated.timing(progress, {
-          toValue: 1, // Move from left (0) to right (1)
-          duration: 1500, // 2 seconds animation
-          easing: Easing.linear, // Smooth linear animation
-          useNativeDriver: false,
+        Animated.timing(rotateAnim, {
+          toValue: 1,
+          duration: 1200, // Smooth rotation
+          easing: Easing.linear,
+          useNativeDriver: true,
         })
       ).start();
     } else {
-      progress.setValue(0); // Reset when stopped
+      rotateAnim.setValue(0);
     }
   }, [loading]);
 
-  if (!loading) return null; // Hide bar when not loading
+  if (!loading) return null;
 
   return (
-    <View style={tw`absolute top-0 left-0 right-0 h-1 bg-gray-200`}>
+    <View style={tw`absolute inset-0 flex items-center justify-center bg-white/50`}>
+      {/* Circular Loader */}
       <Animated.View
         style={[
-          tw`h-full bg-pink-500`,
+          tw`w-16 h-16 border-4 border-gray-300 rounded-full border-t-pink-500`,
           {
-            width: progress.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["10%", "100%"], // Move across screen
-            }),
+            transform: [
+              {
+                rotate: rotateAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["0deg", "360deg"],
+                }),
+              },
+            ],
           },
         ]}
       />
-      <SkeletonLoader />
     </View>
   );
 };
-const SkeletonLoader = () => {
-  return (
-    <View style={tw`p-4`}> 
-      <View style={tw`h-40 bg-gray-300 rounded w-full mb-2 mt-2`} /> 
-      <View style={tw`h-40 bg-gray-300 rounded w-full mb-2`} /> 
-      <View style={tw`h-70 bg-gray-300 rounded w-full mb-2`} /> 
-    </View>
-  );
-};
+
 export default LoadingBar;
