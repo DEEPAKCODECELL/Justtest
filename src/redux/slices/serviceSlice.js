@@ -6,9 +6,7 @@ export const fetchServices = createAsyncThunk(
   'services/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      console.log("Before hitting and waiting");
       const response = await apiClient.get('/admin/get-all-service');
-      console.log("Check response after", response);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to load services');
@@ -16,6 +14,55 @@ export const fetchServices = createAsyncThunk(
   }
 );
 
+export const fetchServicesDetails = createAsyncThunk(
+  'services/fetchServicesDetails',
+  async ({id}, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(`/admin/service/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to load services');
+    }
+  }
+);
+
+export const deleteServices = createAsyncThunk(
+  'services/deleteServices',
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.delete(`/admin/service/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to load services');
+    }
+  }
+);
+
+export const getActualServiceDetals = createAsyncThunk(
+  'services/getActualServiceDetals',
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(`/admin/actual-service/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to load services');
+    }
+  }
+);
+
+
+
+export const fetchServicesForProvider = createAsyncThunk(
+  'services/fetchServicesForProvider',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get('/admin/service');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to load services');
+    }
+  }
+);
 // Fetch service option by ID
 export const fetchServiceOption = createAsyncThunk(
   'services/fetchOption',
@@ -64,7 +111,8 @@ const serviceSlice = createSlice({
     serviceOptions: [], // Added serviceOptions array
     providers: [],
     loading: false, 
-    error: null 
+    error: null,
+    fetchServicesForProvider:[]
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -112,6 +160,18 @@ const serviceSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+     .addCase(fetchServicesForProvider.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchServicesForProvider.fulfilled, (state, action) => {
+        state.loading = false;
+        state.fetchServicesForProvider = action.payload; // Save fetched data
+      })
+      .addCase(fetchServicesForProvider.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
