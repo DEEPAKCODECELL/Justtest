@@ -26,7 +26,7 @@ const VerifyOtp = ({setIsAuthenticated}) => {
     console.log("token", result.payload.data.token);
     console.log("role", result.payload.data.role);
     if (result.payload.data.role != "Admin") navigation.navigate("FetchAddress")
-    else navigation.navigate("AdminBottomTabs");
+    else navigation.navigate("AdminBottomTabsUser");
   } else {
     console.log("Login Failed");
   }
