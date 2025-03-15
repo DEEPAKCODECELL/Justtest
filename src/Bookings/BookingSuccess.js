@@ -1,46 +1,71 @@
-import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { Modal } from "react-native";
-import { View, Text } from "react-native";
-import tw from "twrnc"; // Assuming you are using Tailwind in React Native
+import React, { useEffect } from "react";
+import { View, Animated, Text } from "react-native";
+import { Check, Bike } from "lucide-react-native";
+import tw from "../../tailwind";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-const BookingSuccess = () => {
-    const navigation = useNavigation();
-  const [showModal, setShowModal] = useState(false);
+const SuccessAnimation = () => {
+  const scaleAnim = new Animated.Value(0);
 
   useEffect(() => {
-    const successTimeout = setTimeout(() => {
-      setShowModal(true); // Show modal after 5 seconds
-    }, 5000);
-
-    const redirectTimeout = setTimeout(() => {
-      navigation.navigate("BookingScreen"); //redirecdt in 5 sec
-    }, 10000);
-
-    return () => {
-      clearTimeout(successTimeout);
-      clearTimeout(redirectTimeout);
-    };
+    Animated.timing(scaleAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
-    return (
-      <>
-    <View style={tw`flex-1 justify-center items-center bg-white`}>
-      <Text style={tw`text-2xl font-bold text-green-500`}>Booking Successful!</Text>
-      <Text style={tw`text-lg text-gray-600 mt-2`}>Redirecting you shortly...</Text>
+  return (
+    <View style={tw`flex justify-center items-center`}>
+      <Animated.View
+        style={[
+          tw`w-50 h-50 rounded-full bg-green-500 justify-center items-center`,
+          { transform: [{ scale: scaleAnim }], opacity: scaleAnim },
+        ]}
+      >
+        <Check size={100} color="white" strokeWidth={6} />
+      </Animated.View>
+    </View>
+  );
+};
 
-      {/* Modal appears after 5 sec */}
-      <Modal visible={showModal} transparent animationType="slide">
-        <View style={tw`flex-1 justify-center items-center bg-black/50`}>
-          <View style={tw`bg-white p-6 rounded-xl`}>
-            <Text style={tw`text-xl font-bold text-green-500`}>Booking Confirmed!</Text>
-            <Text style={tw`text-gray-600 mt-2`}>You will be redirected to your bookings...</Text>
-          </View>
-        </View>
-      </Modal>
-      </View>
-    
-            </>
+const ScooterAnimation = () => {
+  const translateX = new Animated.Value(-150);
+
+  useEffect(() => {
+    Animated.timing(translateX, {
+      toValue: 10,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  return (
+    <Animated.View style={[tw`absolute bottom-30`, { transform: [{ translateX }] }]}>
+      <Bike size={200} color="black" />
+    </Animated.View>
+  );
+};
+
+const BookingSuccess = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { BookingId } = route.params || {};
+
+  useEffect(() => {
+    const navigateTimer = setTimeout(() => {
+      navigation.navigate("MapComponent", { BookingId });
+    }, 3000); // Navigate after 3 sec
+
+    return () => clearTimeout(navigateTimer);
+  }, [navigation, transactionId]);
+
+  return (
+    <View style={tw`flex-1 justify-center items-center bg-gray-100 p-6`}>
+      {/* Success Animation & Scooter Animation both start together */}
+      <SuccessAnimation />
+      <Text style={tw`text-4xl font-bold text-green-600 mt-6`}>Booking Confirmed!</Text>
+    </View>
   );
 };
 
