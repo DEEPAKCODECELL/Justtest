@@ -4,9 +4,11 @@ import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { Text, View } from "react-native";
 import useAuthRole from "../Hook/useAuthRole";
 import HomeProvider from "../ServiceProvider/HomeProvider";
-import ProfileScreen from "../profile/ProfileScreen";
 import AroundYou from "../ServiceProvider/AroundYou";
-import UserProfile from "../ServiceProvider/UserProfile";
+import LoadingBar from "../ServiceProvider/components/LoadingBar";
+import ServiceSelectionScreen from "../ServiceProvider/ServiceSelection";
+import { useSelector } from "react-redux";
+import ProfileScreenProvider from "./ProfileScreenProvider";
 
 
 const Tab = createBottomTabNavigator();
@@ -21,13 +23,24 @@ const ProfileIcon = ({ size = 24, color = "black" }) => <Text style={{ fontSize:
 
 const ProviderBottomTabs = ({ setIsAuthenticated }) => {
   const { role, isLoading } = useAuthRole();
+  const providerStatus = useSelector((state) => state?.provider?.providers?.data?.status)
+  const { loading } = useSelector((state) => state?.provider)
+  console.log("providerdata",providerStatus);
   
   if (isLoading) {
-    return <Text>Loading...</Text>; // Show loading while fetching role
+    return <>
+      <LoadingBar loading={isLoading}/>
+    </>; // Show loading while fetching role
   }
 
   if (role !== "ServiceProvider") {
     return <Text>Access Denied</Text>; // Restrict access for non-provider users
+  }
+
+  if (providerStatus=="unverified") {
+    return <>
+    <ServiceSelectionScreen/>
+    </>
   }
 
   return (
@@ -58,7 +71,7 @@ const ProviderBottomTabs = ({ setIsAuthenticated }) => {
       <Tab.Screen name="Progress" component={HomeProvider} />
       <Tab.Screen name="Around You" component={AroundYou} />
       <Tab.Screen name="Profile">
-        {() => <ProfileScreen setIsAuthenticated={setIsAuthenticated} />}
+        {() => <ProfileScreenProvider setIsAuthenticated={setIsAuthenticated} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
