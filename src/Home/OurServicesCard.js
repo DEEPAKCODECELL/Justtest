@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, FlatList, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, FlatList, TouchableOpacity, Alert, ScrollView } from "react-native";
 import Modal from "react-native-modal";
 import tw from "../../tailwind";
 import ServiceModal from "../Bookings/ServiceModal";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchServices } from "../redux/slices/serviceSlice";
-
-
 const OurServicesCard = () => {
   const statedata = useSelector((state) => state);
   console.log("statedata",statedata);
@@ -33,7 +31,7 @@ const OurServicesCard = () => {
   };
 
   return (
-    <View style={tw`bg-white p-4 rounded-lg shadow-lg mt-4`}>
+    <ScrollView style={tw`bg-white p-4 rounded-lg shadow-lg mt-4`}>
       {/* Header */}
       <Text style={tw`text-lg font-bold text-gray-800 mb-1`}>Our Services</Text>
       <Text style={tw`text-gray-600 mb-3`}>Avail one or multiple services in your booking</Text>
@@ -72,9 +70,9 @@ const OurServicesCard = () => {
         swipeDirection="down"
         style={tw`m-0 justify-end`}
       >
-        <ServiceModal/>
+        <ServiceModal selectedService={selectedService}/>
       </Modal>
-    </View>
+    </ScrollView>
   );
 };
 
