@@ -46,7 +46,7 @@ export const EmptyState = ({ title, description, action }) => {
 
 export const ImageUploadPreview = ({ images = [], onAddImage, onRemoveImage, maxImages = 5 }) => {
   return (
-    <View style={tw`space-y-3`}>
+    <View style={tw`gap-3`}>
       <Text style={tw`text-sm font-medium`}>Images ({images.length}/{maxImages})</Text>
       <View style={tw`flex-row flex-wrap gap-3`}>
         {images.map((src, index) => (
@@ -74,7 +74,7 @@ export const ConfirmDeleteDialog = ({ isOpen, onClose, onConfirm, title = "Delet
         <View style={tw`bg-white p-6 rounded-xl w-full max-w-md`}>
           <Text style={tw`text-xl font-semibold`}>{title}</Text>
           <Text style={tw`mt-2 text-gray-500`}>{description}</Text>
-          <View style={tw`mt-6 flex-row justify-end space-x-2`}>
+          <View style={tw`mt-6 flex-row justify-end gap-2`}>
             <TouchableOpacity onPress={onClose} style={tw`px-4 py-2 border rounded`}>
               <Text>Cancel</Text>
             </TouchableOpacity>
