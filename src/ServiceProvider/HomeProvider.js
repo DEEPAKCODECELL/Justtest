@@ -1,13 +1,84 @@
-import React from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { BellIcon, MenuIcon, UserIcon } from "lucide-react-native";
+import React, { startTransition, useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView,Switch, Alert } from "react-native";
+import { BellIcon, CodeSquare, MenuIcon, UserIcon } from "lucide-react-native";
 import { Svg, Line, Rect } from "react-native-svg";
 import tw from "twrnc";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import ServiceSelectionScreen from "./ServiceSelection";
+import { createAvailability, fetchProviders, updateAvailability } from "../redux/slices/ProviderSlice";
+import LoadingBar from "./components/LoadingBar";
+import useWebSocket from "../Hook/GetRealtimeLocation";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import useFetchLocationForProvider from "../Hook/src/Hook/UpdareRealTimeForProvider";
 
 const HomeProvider = () => {
+  const { location, error } = useFetchLocationForProvider(true,false);
+  const providerId = useSelector((state) => state?.provider?.providers?.data?._id)
+  const availability = useSelector((state) => state?.provider?.availability?.success);
+  console.log("availability", availability);
+  const socket = useWebSocket("http://192.168.173.18:4000",providerId);
+  const { loading } = useSelector((state) => state?.provider)
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOnline, setIsOnline] = useState(availability);
+  const toggleOnlineStatus = async () => {
+  try {
+    const scopeIsOnline = isOnline;
+    setIsOnline((prev) => !prev);
 
+    const start_time = "08:00";
+    const end_time = "20:00";
+    const formattedDate = new Date().toString("en-US", { timeZone: "Asia/Kolkata" });
+    const latitude = 12.926717298405626;
+    const longitude = 77.6153102537844;
+
+    let response;
+
+    if (scopeIsOnline) {
+      // If going offline, update availability
+      response = await dispatch(updateAvailability({ latitude, longitude }));
+    } else {
+      // If going online, create availability
+      response = await dispatch(createAvailability({ start_time, end_time, date: formattedDate, latitude, longitude }));
+    }
+
+    if (response?.payload) {
+      console.log("Success:", response);
+      Alert.alert("Success", scopeIsOnline ? "Availability updated successfully!" : "Availability created successfully!");
+    } else {
+      throw new Error("Failed to update/create availability.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    Alert.alert("Error", error.message || "Something went wrong!");
+  }
+};
+
+  useEffect(() => {
+      setIsLoading(true);
+      const getProvider = async () => {
+        try {
+          const result = await dispatch(fetchProviders());
+          console.log("In HomeScreen to get user",result);
+          if (!result?.payload) {
+            console.log("Internal Server Error");
+          }
+        } catch (error) {
+          console.error("Error fetching user:", error);
+        }
+      };
+    getProvider();
+    setIsLoading(false);
+  }, [dispatch]);
+  if (isLoading) {
+    return (
+      <>
+       <LoadingBar loading={isLoading}/>
+      </>
+    )
+  }
   return (
     <View style={tw`flex-1 bg-gray-100`}>
       {/* Main Content Scrollable */}
@@ -31,6 +102,17 @@ const HomeProvider = () => {
             />
           </TouchableOpacity>
         </View>
+
+        {/* Online Toggle Button */}
+      <View style={tw`flex-row items-center justify-between bg-white p-4 rounded-lg shadow-md mb-4`}>
+        <Text style={tw`text-lg font-semibold`}>{isOnline ? "Online" : "Offline"}</Text>
+        <Switch
+          value={isOnline}
+          onValueChange={toggleOnlineStatus}
+          trackColor={{ false: "#ccc", true: "#34D399" }} // Gray for offline, green for online
+          thumbColor={isOnline ? "#10B981" : "#f4f4f4"} // Thumb color
+        />
+      </View>
 
         {/* Earnings */}
         <View style={tw`bg-green-100 p-5 rounded-xl shadow-md mb-4 relative`}>
